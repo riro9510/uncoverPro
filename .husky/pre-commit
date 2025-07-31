@@ -1,0 +1,14 @@
+
+#!/usr/bin/env bash
+# v10-ready Husky hook
+
+# 🚫 Ignorar operaciones especiales de Git
+if [ -d .git/rebase-merge ] || [ -d .git/rebase-apply ] || [ -f .git/MERGE_HEAD ] || [ -f .git/CHERRY_PICK_HEAD ] || [ -f .git/REVERT_HEAD ]; then
+  echo "🔁 Skipping pre-commit hook (merge/rebase/etc detected)."
+  exit 0
+fi
+
+echo "🔍 Running ESLint and Prettier..."
+npm run lint:fix
+npx lint-staged
+

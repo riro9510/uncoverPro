@@ -1,0 +1,68 @@
+{
+  "Mongo Insert One (Mongoose)": {
+    "prefix": "mongoInsertOne",
+    "body": [
+      "import { $1Model } from \"../models/$1\";",
+      "",
+      "const new$1 = await $1Model.create({",
+      "  $2: $3",
+      "});",
+    ],
+    "description": "Insert one Mongoose document using Model.create",
+  },
+  "Mongo Insert Many (Mongoose)": {
+    "prefix": "mongoInsertMany",
+    "body": [
+      "import { $1Model } from \"../models/$1\";",
+      "",
+      "const newDocs = await $1Model.insertMany([",
+      "  { $2: $3 },",
+      "  { $4: $5 }",
+      "]);",
+    ],
+    "description": "Insert many documents using Mongoose insertMany",
+  },
+  "Postgres Insert One": {
+    "prefix": "pgInsertOne",
+    "body": [
+      "import { pool } from \"../config/db\";",
+      "",
+      "await pool.query(",
+      "  'INSERT INTO $1 ($2, $3) VALUES ($4, $5)',",
+      "  [$6, $7]",
+      ");",
+    ],
+    "description": "Insert a record in PostgreSQL",
+  },
+  "Postgres Insert Many (loop)": {
+    "prefix": "pgInsertMany",
+    "body": [
+      "import { pool } from \"../config/db\";",
+      "",
+      "const values = [",
+      "  [$1, $2],",
+      "  [$3, $4]",
+      "];",
+      "",
+      "for (const [col1, col2] of values) {",
+      "  await pool.query(",
+      "    'INSERT INTO $5 ($6, $7) VALUES ($8, $9)',",
+      "    [col1, col2]",
+      "  );",
+      "}",
+    ],
+    "description": "Insert many records in PostgreSQL using loop",
+  },
+  "Joi Schema": {
+    "prefix": "joiSchema",
+    "body": [
+      "import Joi from \"joi\";",
+      "",
+      "const schema = Joi.object({",
+      "  $1: Joi.$2().required(),",
+      "  $3: Joi.$4()",
+      "});",
+    ],
+    "description": "Create a Joi schema",
+  },
+}
