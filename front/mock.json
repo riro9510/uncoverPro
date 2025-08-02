@@ -1,0 +1,110 @@
+{
+  "sections": [
+    {
+      "sectionName": "Personal Information",
+      "fields": [
+        {
+          "question": "Full Name",
+          "type": "input",
+          "placeholder": "John Doe",
+          "validation": {
+            "regex": "^[a-zA-Z ]{2,30}$",
+            "errorMessage": "Please enter a valid name (2-30 letters)"
+          },
+          "required": true
+        },
+        {
+          "question": "Email",
+          "type": "input",
+          "placeholder": "john@example.com",
+          "validation": {
+            "regex": "^\\S+@\\S+\\.\\S+$",
+            "errorMessage": "Please enter a valid email"
+          },
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Professional Skills",
+      "fields": [
+        {
+          "question": "Select your top 5 skills",
+          "type": "multiselect-chips",
+          "options": [
+            "JavaScript",
+            "React",
+            "Node.js",
+            "Teamwork",
+            "Problem Solving",
+            "Communication",
+            "Project Management"
+          ],
+          "placeholder": "Select or type to add custom skills",
+          "allowCustom": true,
+          "maxSelections": 5,
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Work Experience",
+      "fields": [
+        {
+          "question": "Job Title",
+          "type": "input",
+          "placeholder": "Frontend Developer",
+          "required": true
+        },
+        {
+          "question": "Employment Type",
+          "type": "select",
+          "options": [
+            "Full-time",
+            "Part-time",
+            "Contract",
+            "Freelance",
+            "Internship"
+          ],
+          "placeholder": "Select employment type",
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Cover Letter Customization",
+      "fields": [
+        {
+          "question": "Target Company Name",
+          "type": "input",
+          "placeholder": "Google Inc.",
+          "required": false
+        },
+        {
+          "question": "Job Title Applying For",
+          "type": "input",
+          "placeholder": "Senior UX Designer",
+          "required": true
+        },
+        {
+          "question": "Key Qualifications Matching Job Description",
+          "type": "multiselect-chips",
+          "options": [
+            "5+ years experience",
+            "Bachelor's Degree",
+            "Portfolio required",
+            "Leadership skills"
+          ],
+          "placeholder": "Select relevant requirements",
+          "allowCustom": true,
+          "required": false
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "allowSaveProgress": true,
+    "maxCustomOptions": 3,
+    "defaultTheme": "light"
+  }
+}
