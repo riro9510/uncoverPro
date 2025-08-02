@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Open+Sans:wght@300;400&family=Roboto:wght@300&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style/style.css" />
+    <link rel="stylesheet" href="style/modal.css" />
+    <script src="scripts/modal.js" defer></script>
+    <title>UndercoverPro</title>
+</head>
+<body>
+    <section class="hero">
+        <section class="leftContent">
+        <h1>Create your CV & COVER LETTER </h1>
+        <p>Quickly generate a professional CV and COVER LETTER.</p>
+        <button><a href="#" class="btn ctaModalBtn">Create my CV</a></button>
+        </section>
+       <img 
+  src="https://placehold.co/600x400"
+  srcset="
+    https://placehold.co/400x267 400w,
+    https://placehold.co/600x400 600w,
+    https://placehold.co/800x533 800w"
+  sizes="(max-width: 768px) 100vw, 600px"
+  alt="Hero Image"
+  class="heroImage"
+/>
+    </section>
+  <div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <h2 id="modal-title">Sube tu CV</h2>
+    <div id="modal-body">
+    </div>
+    <div class="modal-actions">
+      <button id="modal-submit" class="submit-btn">Enviar</button>
+      <button class="close-btn">Cerrar</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
