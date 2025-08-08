@@ -67,19 +67,25 @@ class ModalForm {
     
     let component;
     switch(field.type) {
-      case 'input':
-        component = this.createInputComponent(field);
-        break;
-      case 'select':
-        component = this.createSelectComponent(field);
-        break;
-      case 'multiselect-chips':
-        component = this.createChipsComponent(field);
-        break;
-      default:
-        component = document.createElement('div');
-        component.textContent = 'Tipo de componente no soportado';
-    }
+  case 'input':
+    component = this.createInputComponent(field);
+    break;
+  case 'select':
+    component = this.createSelectComponent(field);
+    break;
+  case 'multiselect-chips':
+    component = this.createChipsComponent(field);
+    break;
+  case 'textarea': 
+    component = this.createTextareaComponent(field);
+    break;
+  case 'daterange': 
+    component = this.createDateRangeComponent(field);
+    break;
+  default:
+    component = document.createElement('div');
+    component.textContent = 'Unsupported component type';
+}
     
     group.appendChild(component);
     return group;
@@ -152,6 +158,7 @@ class ModalForm {
       container.appendChild(customInput);
     }
     
+    
     const chipsContainer = document.createElement('div');
     chipsContainer.className = 'chips-container';
     container.appendChild(chipsContainer);
@@ -175,6 +182,51 @@ class ModalForm {
     return container;
   }
   
+  createTextareaComponent(field) {
+  const textarea = document.createElement('textarea');
+  textarea.placeholder = field.placeholder || '';
+  textarea.required = field.required || false;
+  textarea.maxLength = field.maxLength || null;
+  
+   textarea.addEventListener('input', (e) => {
+    const remaining = field.maxLength - e.target.value.length;
+    if (remaining < 50) { 
+      const counter = document.getElementById(`${field.question}-counter`) || 
+                     document.createElement('div');
+      counter.id = `${field.question}-counter`;
+      counter.textContent = `${remaining} caracteres restantes`;
+      counter.style.fontSize = '0.8em';
+      counter.style.color = remaining < 10 ? 'red' : '#666';
+      if (!textarea.nextElementSibling || !textarea.nextElementSibling.id.includes('counter')) {
+        textarea.parentNode.appendChild(counter);
+      }
+    }
+  });
+  
+  return textarea;
+}
+
+createDateRangeComponent(field) {
+  const container = document.createElement('div');
+  container.className = 'date-range-container';
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = field.placeholder;
+  input.required = field.required;
+  
+  if (field.validation) {
+    input.pattern = field.validation.regex;
+    input.title = field.validation.errorMessage;
+  }
+  
+  input.addEventListener('change', (e) => {
+    this.formData[field.question] = e.target.value;
+  });
+  
+  container.appendChild(input);
+  return container;
+}
   toggleChip(container, value, field) {
     const existingChip = container.querySelector(`.chip[data-value="${value}"]`);
     
@@ -221,11 +273,18 @@ class ModalForm {
     container.appendChild(chip);
   }
   
-  updateChipsFormData(container, field) {
-    const chips = container.querySelectorAll('.chip');
-    const values = Array.from(chips).map(chip => chip.dataset.value);
-    this.formData[field.question] = values;
+updateChipsFormData(container, field) {
+  const chips = container.querySelectorAll('.chip');
+  const values = Array.from(chips).map(chip => chip.dataset.value);
+  this.formData[field.question] = values;
+  
+  // Actualizar visualmente si no cumple con el mínimo
+  if (field.minSelections && values.length < field.minSelections) {
+    container.style.border = '1px solid #ff4444';
+  } else {
+    container.style.border = '1px solid #ccc';
   }
+}
   
   prevSection() {
     if (this.currentSectionIndex > 0) {
@@ -247,19 +306,40 @@ class ModalForm {
     return this.currentSectionIndex === this.sections.length - 1;
   }
   
-  validateCurrentSection() {
-    const currentSection = this.sections[this.currentSectionIndex];
-    let isValid = true;
-    
-    currentSection.fields.forEach(field => {
-      if (field.required && !this.formData[field.question]) {
+validateCurrentSection() {
+  const currentSection = this.sections[this.currentSectionIndex];
+  let isValid = true;
+
+  currentSection.fields.forEach(field => {
+    if (field.required && !this.formData[field.question]) {
+      isValid = false;
+      alert(`El campo "${field.question}" es requerido`);
+    }
+    if (field.type === 'multiselect-chips') {
+      const currentSelections = this.formData[field.question]?.length || 0;
+      
+      if (field.minSelections && currentSelections < field.minSelections) {
         isValid = false;
-        alert(`El campo "${field.question}" es requerido`);
+        alert(`Debes seleccionar al menos ${field.minSelections} habilidades`);
       }
-    });
-    
-    return isValid;
-  }
+      
+      if (field.maxSelections && currentSelections > field.maxSelections) {
+        isValid = false;
+        alert(`Solo puedes seleccionar máximo ${field.maxSelections} habilidades`);
+      }
+      
+    }
+    if (field.type === 'daterange' && this.formData[field.question]) {
+        const dateRegex = /^(0[1-9]|1[0-2])\/\d{4} - (0[1-9]|1[0-2])\/\d{4}$/;
+        if (!dateRegex.test(this.formData[field.question])) {
+          isValid = false;
+          alert(`Formato de fecha inválido. Usa MM/YYYY - MM/YYYY`);
+        }
+      }
+  });
+
+  return isValid;
+}
   
   open() {
     this.modal.classList.remove('hidden');

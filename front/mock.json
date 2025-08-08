@@ -1,110 +1,190 @@
 {
   "sections": [
     {
-      "sectionName": "Personal Information",
+      "sectionName": "Información Personal",
       "fields": [
         {
-          "question": "Full Name",
+          "question": "Nombre Completo",
           "type": "input",
-          "placeholder": "John Doe",
+          "placeholder": "Ej: María González",
           "validation": {
-            "regex": "^[a-zA-Z ]{2,30}$",
-            "errorMessage": "Please enter a valid name (2-30 letters)"
+            "regex": "^[a-zA-Z áéíóúÁÉÍÓÚñÑ]{2,50}$",
+            "errorMessage": "Nombre inválido (2-50 caracteres)"
           },
+          "required": true
+        },
+        {
+          "question": "Título Profesional",
+          "type": "input",
+          "placeholder": "Ej: Desarrollador Frontend Senior",
           "required": true
         },
         {
           "question": "Email",
           "type": "input",
-          "placeholder": "john@example.com",
+          "placeholder": "tu@email.com",
           "validation": {
             "regex": "^\\S+@\\S+\\.\\S+$",
-            "errorMessage": "Please enter a valid email"
+            "errorMessage": "Email inválido"
+          },
+          "required": true
+        },
+        {
+          "question": "Teléfono",
+          "type": "input",
+          "placeholder": "+52 55 1234 5678",
+          "required": false
+        },
+         {
+          "question": "Perfil de LinkedIn",
+          "type": "input",
+          "placeholder": "https://www.linkedin.com/in/tuusuario",
+          "validation": {
+            "regex": "^https:\\/\\/(www\\.)?linkedin\\.com\\/in\\/[^\\s\\/]+\\/?$",
+            "errorMessage": "URL de LinkedIn inválida"
+          },
+          "required": false
+        }
+      ]
+    },
+    {
+      "sectionName": "Resumen Profesional",
+      "fields": [
+        {
+          "question": "Resumen (3-4 frases)",
+          "type": "textarea",
+          "placeholder": "Ej: Desarrollador con 5+ años de experiencia en React...",
+          "maxLength": 250,
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Habilidades Principales",
+      "fields": [
+        {
+          "question": "Selecciona 5-8 habilidades",
+          "type": "multiselect-chips",
+          "options": [
+             "Teamwork",
+            "Problem Solving",
+            "Communication",
+            "Project Management",
+            "JavaScript",
+            "Digital Marketing"
+          ],
+          "placeholder": "Selecciona o escribe tus habilidades",
+          "allowCustom": true,
+          "minSelections": 5,
+          "maxSelections": 8,
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Experiencia Laboral",
+      "repeatable": true,
+      "maxRepeats": 3,
+      "fields": [
+        {
+          "question": "Puesto",
+          "type": "input",
+          "placeholder": "Ej: Desarrollador Frontend",
+          "required": true
+        },
+        {
+          "question": "Empresa",
+          "type": "input",
+          "placeholder": "Nombre de la empresa",
+          "required": true
+        },
+        {
+          "question": "Periodo",
+          "type": "daterange",
+          "placeholder": "MM/AAAA - MM/AAAA",
+          "validation": {
+            "regex": "^(0[1-9]|1[0-2])/\\d{4} - (0[1-9]|1[0-2])/\\d{4}$",
+            "errorMessage": "Formato: MM/AAAA - MM/AAAA"
+          },
+          "required": true
+        },
+        {
+          "question": "Logros Principales",
+          "type": "textarea",
+          "placeholder": "- Lideré el desarrollo de...\n- Optimicé el rendimiento en...",
+          "required": true
+        }
+      ]
+    },
+    {
+      "sectionName": "Educación",
+      "fields": [
+        {
+          "question": "Título/Certificación",
+          "type": "input",
+          "placeholder": "Ej: Lic. en Ciencias de la Computación",
+          "required": true
+        },
+        {
+          "question": "Institución",
+          "type": "input",
+          "placeholder": "Nombre de la universidad",
+          "required": true
+        },
+        {
+          "question": "Año de Graduación",
+          "type": "year",
+          "placeholder": "AAAA",
+          "validation": {
+            "regex": "^(19|20)\\d{2}$",
+            "errorMessage": "Año inválido"
           },
           "required": true
         }
       ]
     },
     {
-      "sectionName": "Professional Skills",
+      "sectionName": "Personalización de Carta",
       "fields": [
         {
-          "question": "Select your top 5 skills",
-          "type": "multiselect-chips",
-          "options": [
-            "JavaScript",
-            "React",
-            "Node.js",
-            "Teamwork",
-            "Problem Solving",
-            "Communication",
-            "Project Management"
-          ],
-          "placeholder": "Select or type to add custom skills",
-          "allowCustom": true,
-          "maxSelections": 5,
+          "question": "Nombre de la Empresa Destino",
+          "type": "input",
+          "placeholder": "Ej: Google México",
+          "required": false
+        },
+        {
+          "question": "Puesto al que Aplicas",
+          "type": "input",
+          "placeholder": "Ej: Ingeniero de Software Senior",
           "required": true
         }
       ]
     },
     {
-      "sectionName": "Work Experience",
-      "fields": [
-        {
-          "question": "Job Title",
-          "type": "input",
-          "placeholder": "Frontend Developer",
-          "required": true
-        },
-        {
-          "question": "Employment Type",
-          "type": "select",
-          "options": [
-            "Full-time",
-            "Part-time",
-            "Contract",
-            "Freelance",
-            "Internship"
-          ],
-          "placeholder": "Select employment type",
-          "required": true
-        }
-      ]
-    },
+  "sectionName": "Idiomas",
+  "fields": [
     {
-      "sectionName": "Cover Letter Customization",
-      "fields": [
-        {
-          "question": "Target Company Name",
-          "type": "input",
-          "placeholder": "Google Inc.",
-          "required": false
-        },
-        {
-          "question": "Job Title Applying For",
-          "type": "input",
-          "placeholder": "Senior UX Designer",
-          "required": true
-        },
-        {
-          "question": "Key Qualifications Matching Job Description",
-          "type": "multiselect-chips",
-          "options": [
-            "5+ years experience",
-            "Bachelor's Degree",
-            "Portfolio required",
-            "Leadership skills"
-          ],
-          "placeholder": "Select relevant requirements",
-          "allowCustom": true,
-          "required": false
-        }
-      ]
+      "question": "Idiomas y Nivel",
+      "type": "multiselect-chips",
+      "options": [
+        "Español - Nativo",
+        "Inglés - Avanzado",
+        "Francés - Intermedio",
+        "Alemán - Básico"
+      ],
+      "allowCustom": true,
+      "maxSelections": 4,
+      "required": false
     }
+  ]
+}
+
   ],
   "settings": {
     "allowSaveProgress": true,
-    "maxCustomOptions": 3,
-    "defaultTheme": "light"
+    "maxCustomOptions": 5,
+    "defaultTheme": "light",
+    "maxOnePage": true,
+    "highlightColor": "#FFECB3"
   }
 }
