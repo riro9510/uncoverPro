@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import Formulario from '@/models/formulario.model.js';
+import Formulario from '../models/formulario.model.js';
 
 const create = async (data: any) => {
   const register = await Formulario.create({ data });
