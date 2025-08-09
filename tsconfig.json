@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
-    "types": ["jest","node"],
+    "types": ["node"],
     "allowJs": true ,
   },
   "include": ["src/**/*.ts","src/**/*.js"],
