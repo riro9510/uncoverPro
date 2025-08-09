@@ -1,7 +1,6 @@
 import Language from '../services/language.service.js';
 import { Request, Response, NextFunction } from 'express';
 
-
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await Language.getAll();
@@ -20,8 +19,7 @@ const getById = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-
 export default {
   getAll,
-  getById
+  getById,
 };

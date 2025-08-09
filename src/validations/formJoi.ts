@@ -7,7 +7,6 @@ const linkedInRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[^\s\/]+\/?$/;
 const periodRegex = /^(0[1-9]|1[0-2])\/\d{4} - (0[1-9]|1[0-2])\/\d{4}$/;
 const yearRegex = /^(19|20)\d{2}$/;
 
-
 const formResponsesSchema = Joi.object({
   'personal_info.full_name': Joi.string().pattern(nameRegex).required(),
   'personal_info.professional_title': Joi.string().required(),
@@ -33,17 +32,14 @@ const formResponsesSchema = Joi.object({
 
   'languages.languages': Joi.array().items(Joi.string()).max(4).optional(),
 
-  'availability.immediate': Joi.boolean().optional()
+  'availability.immediate': Joi.boolean().optional(),
 });
 
-
-function validateFormResponses(data:any) {
+function validateFormResponses(data: any) {
   return formResponsesSchema.validate(data, {
     abortEarly: false,
-    allowUnknown: false
+    allowUnknown: false,
   });
 }
 
-
-export default validateFormResponses
-
+export default validateFormResponses;
