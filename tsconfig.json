@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
-    "types": ["node"],
+    //"types": ["node"], solucion temporal
     "allowJs": true ,
   },
   "include": ["src/**/*.ts","src/**/*.js"],
