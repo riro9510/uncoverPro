@@ -11,6 +11,6 @@ const mockUser: User = {
   updatedAt: new Date(),
 };
 
-export const getUser = (req: Request, res: Response) => {
+/*export const getUser = (req: Request, res: Response) => {
   res.json(mockUser);
-};
+};*/
