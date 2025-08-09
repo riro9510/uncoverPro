@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
-    "types": ["node","express"],
+    "types": ["node"],
     "allowJs": true ,
   },
   "include": ["src/**/*.ts","src/**/*.js"],
