@@ -1,5 +1,5 @@
 import formquestionsService from '../services/formquestions.service.js';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express-serve-static-core';
 
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
   try {

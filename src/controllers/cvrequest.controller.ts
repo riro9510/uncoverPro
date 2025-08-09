@@ -1,5 +1,6 @@
 import cvrequestService from '../services/cvrequest.service.js';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express-serve-static-core';
+
 
 const create = async (req: Request, res: Response, next: NextFunction) => {
   try {
