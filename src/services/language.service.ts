@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 import Language from '../models/language.model.js';
 
-
 const getAll = async () => {
   return await Language.find();
 };
@@ -13,8 +12,7 @@ const getById = async (id: any) => {
   return await Language.findById(id);
 };
 
-
 export default {
   getAll,
-  getById
+  getById,
 };

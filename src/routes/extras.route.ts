@@ -1,11 +1,7 @@
+import express from 'express';
+import extrasController from '../controllers/extras.controller.js';
+const router = express.Router();
 
-        import express from 'express';
-        import extrasController from '../controllers/extras.controller.js';
-        const router = express.Router();
+router.get('/', extrasController.getAll);
 
-        router.get('/', extrasController.getAll);
-
-
-
-        export default router;
-        
+export default router;
