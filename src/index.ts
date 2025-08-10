@@ -1,7 +1,6 @@
 import express from 'express';
 import router from './routes/index.routes.js';
 import 'dotenv/config';
-import 'tsconfig-paths/register.js';
 import { connectDB } from './config/database.js';
 
 const app = express();
