@@ -35,4 +35,3 @@ const ExtraSchema = new Schema(
 );
 
 export default mongoose.models.extras || mongoose.model('extras', ExtraSchema);
-
