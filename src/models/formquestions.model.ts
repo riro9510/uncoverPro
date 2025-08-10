@@ -79,4 +79,5 @@ const FormSchema = new Schema<IForm>(
 
 FormSchema.index({ 'en.sections.sectionName': 'text' });
 
-export default mongoose.model('Form', FormSchema);
+export default mongoose.models.questions || mongoose.model('questions', FormSchema);
+
