@@ -34,4 +34,5 @@ const ExtraSchema = new Schema(
   }
 );
 
-export default mongoose.model('Extra', ExtraSchema);
+export default mongoose.models.extras || mongoose.model('extras', ExtraSchema);
+
