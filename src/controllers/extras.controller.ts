@@ -1,5 +1,5 @@
 import extrasService from '../services/extras.service.js';
-import type { Request, Response, NextFunction } from 'express-serve-static-core';
+import { Request, Response, NextFunction } from 'express';
 
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
