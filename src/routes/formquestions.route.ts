@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.get('/', formquestionsController.getAll);
 
-router.get('/:id', formquestionsController.getById);
+router.get('/:id', formquestionsController.getByLanguagename);
 
 export default router;

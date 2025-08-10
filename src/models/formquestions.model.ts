@@ -80,4 +80,3 @@ const FormSchema = new Schema<IForm>(
 FormSchema.index({ 'en.sections.sectionName': 'text' });
 
 export default mongoose.models.questions || mongoose.model('questions', FormSchema);
-

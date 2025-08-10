@@ -10,9 +10,9 @@ const getAll = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-const getById = async (req: Request, res: Response, next: NextFunction) => {
+const getByLanguagename = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await formquestionsService.getById(req.params.id);
+    const result = await formquestionsService.getByLanguageName(req.params.id);
     res.json(result);
   } catch (error) {
     next(error);
@@ -21,5 +21,5 @@ const getById = async (req: Request, res: Response, next: NextFunction) => {
 
 export default {
   getAll,
-  getById,
+ getByLanguagename,
 };

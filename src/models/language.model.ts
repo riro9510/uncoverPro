@@ -116,4 +116,3 @@ LanguageSchema.pre('save', function (next) {
 });
 
 export default mongoose.models.languages || mongoose.model('languages', LanguageSchema);
-

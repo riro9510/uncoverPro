@@ -9,7 +9,7 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 connectDB();
 app.use(express.json());
 app.use('/api', router, (req, res) => {
-  console.log( 'Response:', res.statusCode, res.statusMessage,res);
+  console.log('Response:', res.statusCode, res.statusMessage, res);
 });
 
 app.listen(PORT, '0.0.0.0', () => {
