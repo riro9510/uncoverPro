@@ -1,38 +1,33 @@
 import mongoose from 'mongoose';
 import Extras from '../models/extras.model.js';
 
-const getAllExtras = async (lang = 'en') => {
-  const extras = await Extras.findOne({});
+const getExtrasByLang = async (lang: string) => {
+  const extrasDocs = await Extras.find().lean();
+  if (!extrasDocs.length) return {};
 
-  if (!extras) return [];
+  const result: Record<string, string> = {};
 
-  // Transforma a formato de tuplas
-  return [
-    [
-      'errors.pdfGeneration',
-      extras.errors?.pdfGeneration?.[lang] || extras.errors?.pdfGeneration?.en,
-    ],
-    [
-      'errors.retrySuggestion',
-      extras.errors?.retrySuggestion?.[lang] || extras.errors?.retrySuggestion?.en,
-    ],
-    [
-      'accessibility.statement',
-      extras.accessibility?.statement?.[lang] || extras.accessibility?.statement?.en,
-    ],
-    [
-      'accessibility.labels.closeModal',
-      extras.accessibility?.labels?.closeModal?.[lang] ||
-        extras.accessibility?.labels?.closeModal?.en,
-    ],
-    [
-      'accessibility.labels.fileInput',
-      extras.accessibility?.labels?.fileInput?.[lang] ||
-        extras.accessibility?.labels?.fileInput?.en,
-    ],
-  ].filter(([_, value]) => value !== undefined);
+  const isPlainObject = (value: any) =>
+    value !== null && typeof value === 'object' && !Array.isArray(value);
+
+  const traverse = (obj: any, prefix = '') => {
+    for (const key in obj) {
+      if (isPlainObject(obj[key])) {
+        traverse(obj[key], prefix ? `${prefix}.${key}` : key);
+      } else if (typeof obj[key] === 'string' && key === lang) {
+        result[prefix] = obj[key];
+      }
+    }
+  };
+
+  for (const doc of extrasDocs) {
+    traverse(doc);
+  }
+
+  return result;
 };
 
+
 export default {
-  getAllExtras,
+  getExtrasByLang
 };

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 const getAll = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const langParam = req.query.lang;
+    const langParam = req.params.lang;
     const lang: string | undefined = Array.isArray(langParam)
       ? typeof langParam[0] === 'string'
         ? langParam[0]
@@ -11,11 +11,11 @@ const getAll = async (req: Request, res: Response, next: NextFunction) => {
       : typeof langParam === 'string'
         ? langParam
         : undefined;
-    const extras = await extrasService.getAllExtras(lang ?? 'en');
+    const extras = await extrasService.getExtrasByLang(lang ?? 'en');
 
     res.json({
       success: true,
-      data: Object.fromEntries(extras),
+      data: extras,
     });
   } catch (error: any) {
     res.status(500).json({
