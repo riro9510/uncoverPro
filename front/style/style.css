@@ -82,6 +82,17 @@ button a {
   max-width: 350px;
   border-radius: 12px;
 }
+.topbar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 4rem;
+  display: flex;
+  justify-content: flex-end;
+  background: var(--secondary);
+  border-radius: 20px 20px 0 0;
+}
+
 
 /* Tablet & Desktop */
 @media (min-width: 768px) {

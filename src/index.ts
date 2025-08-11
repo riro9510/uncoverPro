@@ -15,7 +15,9 @@ const frontendPath = path.join(__dirname, '../front');
 connectDB();
 app.use(express.json());
 app.use(express.static(frontendPath));
-app.use('/api', router);
+app.use('/api', router, (req, res) => {
+  console.log('Response:', res.statusCode, res.statusMessage, res);
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
