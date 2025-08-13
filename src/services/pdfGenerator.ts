@@ -16,8 +16,8 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
     const doc = new PDFDocument({ margin: 50 });
     const chunks: Buffer[] = [];
     const titles = getSectionTitles(data['code'] || 'en');
-    const alignDirection = data.rtl ? 'right' : 'left'; 
-    console.log("Direccion establecida", alignDirection);
+    const alignDirection = data['rtl'] == true? 'right' : 'left'; 
+    console.log("Direccion establecida", alignDirection, console.log(data['rtl']));
     // Recolectar chunks del PDF en memoria
     doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
@@ -102,7 +102,8 @@ export function generateCoverLetterBuffer(data: FormRequest): Promise<Buffer> {
     const doc = new PDFDocument({ margin: 50 });
     const chunks: Buffer[] = [];
 
-    const alignDirection = data.rtl ? 'right' : 'left';
+    const alignDirection = data['rtl'] == true? 'right' : 'left'; 
+    console.log("Direccion establecida", alignDirection, console.log(data['rtl']));
     const texts = getCoverLetterTexts(data.code || 'en');
 
     doc.on('data', (chunk) => chunks.push(chunk));
