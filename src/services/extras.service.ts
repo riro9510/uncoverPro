@@ -27,7 +27,6 @@ const getExtrasByLang = async (lang: string) => {
   return result;
 };
 
-
 export default {
-  getExtrasByLang
+  getExtrasByLang,
 };

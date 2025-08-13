@@ -6,7 +6,7 @@ const getAll = async () => {
 };
 
 const getById = async (id: any) => {
-   const language = await Language.find().lean();
+  const language = await Language.find().lean();
   return language.find((lang) => lang.language.toString() === id.toString()) || null;
 };
 

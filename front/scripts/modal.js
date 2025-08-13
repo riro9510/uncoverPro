@@ -50,7 +50,9 @@ class ModalForm {
     const nextBtn = document.createElement('button');
     nextBtn.className = 'nav-btn next-btn';
     nextBtn.textContent = this.isLastSection() ? 'Enviar' : 'Siguiente';
-    nextBtn.addEventListener('click', () => this.isLastSection() ? this.submitForm() : this.nextSection());
+    nextBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.isLastSection() ? this.submitForm() : this.nextSection()});
     this.modalActions.appendChild(nextBtn);
   }
   
@@ -420,18 +422,44 @@ validateCurrentSection() {
   // Mostrar spinner
   this.showLoadingState();
 
-  try {
+   try {
     const client = new WebSocketClient('ws://localhost:3000');
-    client.connect().then(()=>{
-      client.sendJSON(this.formData);
-    }).catch(err => console.error('Error conecting to WS', err));
-    
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Cambiar a estado de descarga
-    this.showDownloadState();
+
+    // Primero asignamos el listener
+    client.handleMessage = (data) => {
+      switch (data.type) {
+        case 'update':
+          console.log('📡 Estado del proceso:', data.payload);
+          break;
+        case 'ready':
+          console.log('✅ Archivos listos');
+          this.cvUrl = data.cvUrl;
+          this.letterUrl = data.letterUrl;
+          this.showDownloadState(); // ✅ Solo aquí
+          break;
+        case 'error':
+          console.error('❌ Error del servidor:', data.message);
+          this.resetToFormState(); // ❌ Solo si hay error
+          alert('Error al procesar el formulario');
+          break;
+        default:
+          console.warn('Mensaje desconocido:', data);
+      }
+    };
+
+    client.connect()
+      .then(() => {
+        console.log('✅ Conexión establecida');
+        client.sendJSON(this.formData); // Enviamos datos
+      })
+      .catch(err => {
+        console.error('❌ Error conectando a WS', err);
+        this.resetToFormState(); // ❌ Reseteamos si falla la conexión
+        alert('Error al procesar el formulario');
+      });
+
   } catch (error) {
-    console.error('Error al procesar:', error);
+    console.error('❌ Error al procesar:', error);
     this.resetToFormState();
     alert('Error al procesar el formulario');
   }
