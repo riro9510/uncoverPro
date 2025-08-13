@@ -5,7 +5,7 @@ import { connectDB } from './config/database.js';
 import path from 'path';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
-import http from 'http';
+
 //import { fileURLToPath } from 'url';
 
 //const __filename = fileURLToPath(import.meta.url);
@@ -34,41 +34,17 @@ app.use(cors({
   },
   credentials: true, // habilita Access-Control-Allow-Credentials
 }));
-
-//app.use(express.json());
+app.use(express.json());
 //app.use(express.static(frontendPath));
-/*app.use('/api', router, (req, res) => {
+app.use('/api', router, (req, res) => {
   console.log('Response:', res.statusCode, res.statusMessage, res);
-});*/
+});
 
 /*app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });*/
 
-/*app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
-});*/
-
-const server = http.createServer(app);
-
-const wss = new WebSocketServer({ server });
-
-wss.on('connection', (ws) => {
-  console.log('Client connected through web-socket');
-
-  ws.on('message', (message) => {
-    console.log('Mensaje recibido:', message.toString());
-
-    ws.send(`Servidor recibió: ${message}`);
-  });
-
-  ws.on('close', () => {
-    console.log('Cliente desconectado');
-  });
-});
-
-// --- Iniciar servidor HTTP + WebSocket ---
-server.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor HTTP/WebSocket escuchando en puerto ${PORT}`);
 });
 export default app;
