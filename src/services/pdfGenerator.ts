@@ -16,8 +16,8 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
     const doc = new PDFDocument({ margin: 50 });
     const chunks: Buffer[] = [];
     const titles = getSectionTitles(data['code'] || 'en');
-    const alignDirection = data.rtl ? 'right' : 'left'; // Nuevo valor de alineación
-
+    const alignDirection = data.rtl ? 'right' : 'left'; 
+    console.log("Direccion establecida", alignDirection);
     // Recolectar chunks del PDF en memoria
     doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => resolve(Buffer.concat(chunks)));
