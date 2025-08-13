@@ -8,9 +8,9 @@ import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import http from 'http';
 import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
-//import { fileURLToPath } from 'url';
+import { fileURLToPath } from 'url';
 
-//const __filename = fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
