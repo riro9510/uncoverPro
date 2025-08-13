@@ -18,6 +18,7 @@ const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 const allowedOrigins = [
   'http://localhost:3000',
    'http://127.0.0.1:5500',
+   'https://riro9510.github.io'
 ];
 
 connectDB();
