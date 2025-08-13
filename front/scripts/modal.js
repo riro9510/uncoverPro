@@ -1,6 +1,8 @@
 import { GetRequest } from "./api/typeRequest.js";
 import { WebSocketClient } from "./api/webSocket.js";
 
+let languageSelected;
+
 class ModalForm {
   constructor() {
     this.modal = document.getElementById('modal');
@@ -450,11 +452,13 @@ validateCurrentSection() {
     client.connect()
       .then(() => {
         console.log('✅ Conexión establecida');
-        client.sendJSON(this.formData); // Enviamos datos
+        const isRtl = document.documentElement.getAttribute('dir') === 'rtl';
+        const finalJson = {...this.formData,code:languageSelected,rtl:isRtl}
+        client.sendJSON(this.formData); 
       })
       .catch(err => {
         console.error('❌ Error conectando a WS', err);
-        this.resetToFormState(); // ❌ Reseteamos si falla la conexión
+        this.resetToFormState(); 
         alert('Error al procesar el formulario');
       });
 
@@ -511,17 +515,15 @@ resetToFormState() {
 }
 
 handleDownload() {
-  console.log("Download URLs:", this.cvUrl, this.letterUrl);
-  
+  console.log("Download ZIP URL:", this.zipUrl);
+
   const downloadFile = (url, filename) => {
-    // Solución principal con manejo de errores
     try {
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
-      link.target = '_blank'; // Para evitar problemas con popup blockers
-      
-      // Solución alternativa si falla la descarga automática
+      link.target = '_blank';
+
       link.onclick = () => {
         setTimeout(() => {
           if (!document.body.contains(link)) {
@@ -532,8 +534,7 @@ handleDownload() {
 
       document.body.appendChild(link);
       link.click();
-      
-      // Limpieza después del click
+
       setTimeout(() => {
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
@@ -544,11 +545,12 @@ handleDownload() {
     }
   };
 
-  // Descargar ambos archivos
-  downloadFile(this.cvUrl, `CV_${new Date().toISOString().slice(0,10)}.pdf`);
-  downloadFile(this.letterUrl, `CartaPresentacion_${new Date().toISOString().slice(0,10)}.pdf`);
-  
-  //alert('Descargando archivos...');
+  // Descargar el ZIP en lugar de dos PDFs
+  downloadFile(
+    this.zipUrl,
+    `Documentos_${new Date().toISOString().slice(0, 10)}.zip`
+  );
+    //alert('Descargando archivos...');
   //this.close();
 }
 
@@ -558,6 +560,7 @@ const modalForm = new ModalForm();
 
 document.querySelector('.ctaModalBtn').addEventListener('click',async () => {
   let defaultLanguage = await localStorage.getItem("language") || 'en';
+  languageSelected = defaultLanguage;
   const languagePackage = new GetRequest(`formquestions/${defaultLanguage}`);
   languagePackage.send()
     .then(response => {
