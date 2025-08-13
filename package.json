@@ -11,7 +11,8 @@
     "start": "node -r module-alias/register dist/index.js",
     "lint:src": "eslint 'src/**/*.{ts,tsx}'",
     "lint:fix": "eslint . --ext .ts --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postbuild": "cp -r public dist/public"
   },
   "repository": {
     "type": "git",
