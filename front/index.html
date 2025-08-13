@@ -9,12 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Open+Sans:wght@300;400&family=Roboto:wght@300&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style/style.css" />
     <link rel="stylesheet" href="style/modal.css" />
+    <link rel="stylesheet" href="style/animation.css">
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script type="module" src="scripts/modal.js"></script>
     <script type="module" src="scripts/languages.js"></script>
+    <script src="scripts/animation.js" defer></script>
     <title>UncoverPro</title>
 </head>
 <body>
+  <div id="splash-screen" class="splash-screen">
+    <div id="scattered-words" class="scattered-words"></div>
+    <div id="central-phrases" class="central-phrases"></div>
+  </div>
+  <div class="hidden">
    <header class="topbar">
   <select id="language-select" aria-label="Select language">
     </select>
@@ -47,6 +54,7 @@
       <button class="close-btn">Cerrar</button>
     </div>
   </div>
+</div>
 </div>
 </div>
 </body>

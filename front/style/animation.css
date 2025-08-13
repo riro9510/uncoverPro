@@ -1,0 +1,69 @@
+/* Pantalla de bienvenida */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+
+.scattered-words {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scattered-words span {
+  position: absolute;
+  font-size: 1.2rem;
+  opacity: 0.25;
+  color: #333;
+  font-weight: 300;
+  font-family: 'Open Sans', sans-serif;
+  animation: float 6s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-15px); }
+}
+
+/* Frases centrales */
+.central-phrases {
+  position: relative;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: bold;
+  color: #222;
+  opacity: 0;
+  animation: fadeInOut 3s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: scale(0.95); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+@keyframes contractFadeOut {
+  0% { opacity: 0; transform: scale(1.2); }
+  20% { opacity: 1; transform: scale(1); }
+  80% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.8); }
+}
+
+
+.hidden {
+  display: none;
+}
