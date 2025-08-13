@@ -7,7 +7,7 @@ export interface FormRequest {
 
   'professional_summary.summary': string;
 
-  'key_skills.skills': string[];
+  'key_skills.skills': string;
   'work_experience.job_title': string;
   'work_experience.company': string;
   'work_experience.period': string;
@@ -20,7 +20,7 @@ export interface FormRequest {
   'letter_customization.target_company'?: string;
   'letter_customization.target_position': string;
 
-  'languages.languages'?: string[]; // max 4
+  'languages.languages'?: string; // max 4
 
   'availability.immediate'?: boolean;
 }
