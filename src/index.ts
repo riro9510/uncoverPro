@@ -73,14 +73,15 @@ wss.on('connection', (ws) => {
       await generateCoverLetter(payload, letterPath);
       console.log('📄 Cover letter generated');
 
-      ws.send(JSON.stringify({
-        type: 'ready',
-        cvUrl: '/cv.pdf',
-        letterUrl: '/coverLetter.pdf'
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'ready',
+          cvUrl: '/cv.pdf',
+          letterUrl: '/coverLetter.pdf',
+        })
+      );
       console.log('✅ Ready sent');
-
-    } catch (err:any) {
+    } catch (err: any) {
       console.error('❌ WS handler error:', err);
       try {
         ws.send(JSON.stringify({ type: 'error', message: err.message }));
@@ -91,7 +92,6 @@ wss.on('connection', (ws) => {
   ws.on('close', () => console.log('⚠️ Client disconnected'));
   ws.on('error', (err) => console.error('❌ WS error:', err));
 });
-
 
 // --- Iniciar servidor HTTP + WebSocket ---
 server.listen(PORT, '0.0.0.0', () => {
