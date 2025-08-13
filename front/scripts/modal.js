@@ -2,7 +2,7 @@ import { GetRequest } from "./api/typeRequest.js";
 import { WebSocketClient } from "./api/webSocket.js";
 
 let languageSelected;
-
+let jsonEnviado;
 class ModalForm {
   constructor() {
     this.modal = document.getElementById('modal');
@@ -454,7 +454,8 @@ validateCurrentSection() {
         console.log('✅ Conexión establecida');
         const isRtl = document.documentElement.getAttribute('dir') === 'rtl';
         const finalJson = {...this.formData,code:languageSelected,rtl:isRtl}
-        client.sendJSON(this.formData); 
+        jsonEnviado = finalJson;
+        client.sendJSON(finalJson); 
       })
       .catch(err => {
         console.error('❌ Error conectando a WS', err);
@@ -519,7 +520,7 @@ handleDownload() {
     console.error('‼️ ERROR: URL mal formada', this.zipUrl);
     
     // Reconstruye la URL manualmente si es necesario
-    const params = new URLSearchParams(this.formData); // Asegúrate que this.formData existe
+    const params = new URLSearchParams(jsonEnviado); // Asegúrate que this.formData existe
     const reconstructedUrl = `https://uncoverpro.onrender.com/generate-zip?${params.toString()}`;
     
     console.log('URL reconstruida:', reconstructedUrl);
