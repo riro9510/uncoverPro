@@ -6,7 +6,7 @@ import path from 'path';
 import fs from 'fs';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
-import http from 'http';
+import https from 'http';
 import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
 import { fileURLToPath } from 'url';
 
@@ -72,7 +72,7 @@ app.get('/download/:filename', (req, res) => {
   console.log(`Server is running on port ${PORT}`);
 });*/
 
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 const wss = new WebSocketServer({ server });
 

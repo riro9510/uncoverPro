@@ -423,7 +423,7 @@ validateCurrentSection() {
   this.showLoadingState();
 
    try {
-    const client = new WebSocketClient('ws://localhost:3000');
+    const client = new WebSocketClient('wss://uncoverpro.onrender.com');//const client = new WebSocketClient('ws://localhost:3000');
 
     // Primero asignamos el listener
     client.handleMessage = (data) => {
