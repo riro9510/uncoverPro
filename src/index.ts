@@ -10,6 +10,7 @@ import https from 'http';
 import { generateCoverLetterBuffer, generateCVBuffer } from './services/pdfGenerator.js';
 import { fileURLToPath } from 'url';
 import { FormRequest } from './models/formRequestInterface.js';
+import archiver from 'archiver';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -65,24 +66,32 @@ app.get('/download/:filename', (req, res) => {
   }
 });
 
-app.get('/generate-pdf', async (req, res) => {
+app.get('/generate-both', async (req, res) => {
   try {
-    const { type, ...queryParams } = req.query;
-    const filename = `${type}_${Date.now()}.pdf`;
-    const filePath = path.join(PUBLIC_DIR, filename);
+    // Recibimos el payload de la query
+    const queryParams = req.query as unknown as FormRequest;
 
-    const payload = queryParams as unknown as FormRequest;
-    
-    const pdfBuffer = type === 'cv' 
-      ? await generateCVBuffer(payload)
-      : await generateCoverLetterBuffer(payload);
+    // Generar ambos PDFs en memoria
+    const cvBuffer = await generateCVBuffer(queryParams);
+    const letterBuffer = await generateCoverLetterBuffer(queryParams);
 
-    await fs.promises.writeFile(filePath, pdfBuffer);
+    // Configurar headers para ZIP
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Documentos_${Date.now()}.zip`
+    );
 
-    res.download(filePath, () => {
-      setTimeout(() => fs.unlink(filePath, () => {}), 50000);
-    });
+    // Crear el zip y enviarlo en streaming
+    const archive = archiver('zip', { zlib: { level: 9 } });
+    archive.pipe(res);
+
+    archive.append(cvBuffer, { name: 'CV.pdf' });
+    archive.append(letterBuffer, { name: 'CartaPresentacion.pdf' });
+
+    await archive.finalize();
   } catch (err: any) {
+    console.error('❌ Error generando ZIP:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -110,11 +119,12 @@ wss.on('connection', (ws) => {
         throw new Error('Faltan datos requeridos');
       }
 
-      ws.send(JSON.stringify({
-        type: 'ready',
-        cvUrl: `${baseUrl}/generate-pdf?type=cv&${new URLSearchParams(payload)}`,
-        letterUrl: `${baseUrl}/generate-pdf?type=cover-letter&${new URLSearchParams(payload)}`
-      }));
+       ws.send(JSON.stringify({
+      type: 'ready',
+      zipUrl: `${baseUrl}/generate-both?${new URLSearchParams(payload)}`
+    }));
+
+
     } catch (err: any) {
       console.error('❌ WS error:', err);
       ws.send(JSON.stringify({ 
