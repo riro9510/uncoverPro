@@ -1,9 +1,11 @@
 
 
 const env = "prod";
-const baseURL = (env === 'prod' 
+const baseURL = (env == "prod"
   ? 'https://uncoverpro.onrender.com/api' 
   : 'http://localhost:3000/api');
+
+console.log("dominio base",baseURL);
 
 const getToken = () => localStorage.getItem('api_token');
 
