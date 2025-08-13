@@ -517,6 +517,7 @@ handleDownload() {
     link.download = filename;
     document.body.appendChild(link);
     link.click();
+    console.log("url donde se intenta descargar", link,)
     document.body.removeChild(link);
   };
 
@@ -524,7 +525,7 @@ handleDownload() {
   downloadFile(this.letterUrl, 'coverLetter.pdf');
 
   alert('Descargando archivos...');
-  this.close();
+  //this.close();
 }
 
 }
