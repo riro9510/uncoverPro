@@ -13,6 +13,7 @@ import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
 //const __dirname = path.dirname(__filename);
 
 const app = express();
+app.use(express.static(path.join(process.cwd(), 'public')));
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 //const frontendPath = path.join(__dirname, '../front');
 
