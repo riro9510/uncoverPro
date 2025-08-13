@@ -6,10 +6,8 @@ const getAll = async () => {
 };
 
 const getById = async (id: any) => {
-  if (!mongoose.Types.ObjectId.isValid(id)) {
-    throw new Error('ID inválido');
-  }
-  return await Language.findById(id);
+   const language = await Language.find().lean();
+  return language.find((lang) => lang.language.toString() === id.toString()) || null;
 };
 
 export default {

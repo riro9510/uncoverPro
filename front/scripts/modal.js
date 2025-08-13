@@ -1,3 +1,5 @@
+import { GetRequest } from "./api/typeRequest.js";
+
 class ModalForm {
   constructor() {
     this.modal = document.getElementById('modal');
@@ -10,6 +12,18 @@ class ModalForm {
     this.currentSectionIndex = 0;
     this.formData = {};
     this.jsonData = null;
+
+    this.modal.addEventListener('click', (event) => {
+      if (event.target === this.modal) {
+        this.close();
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        this.close();
+      }
+    });
   }
   
   init(jsonData) {
@@ -82,6 +96,12 @@ class ModalForm {
   case 'daterange': 
     component = this.createDateRangeComponent(field);
     break;
+   case 'checkbox':
+    component = this.createCheckboxComponent(field); 
+    break;
+   case 'year':
+    component = this.createInputComponent(field);
+    break;
   default:
     component = document.createElement('div');
     component.textContent = 'Unsupported component type';
@@ -103,7 +123,7 @@ class ModalForm {
     }
     
     input.addEventListener('change', (e) => {
-      this.formData[field.question] = e.target.value;
+      this.formData[field.fieldId] = e.target.value;
     });
     
     return input;
@@ -128,7 +148,7 @@ class ModalForm {
     });
     
     select.addEventListener('change', (e) => {
-      this.formData[field.question] = e.target.value;
+      this.formData[field.fieldId] = e.target.value;
     });
     
     return select;
@@ -182,14 +202,83 @@ class ModalForm {
     return container;
   }
   
-  createTextareaComponent(field) {
+ 
+  toggleChip(container, value, field) {
+    const existingChip = container.querySelector(`.chip[data-value="${value}"]`);
+    
+    if (existingChip) {
+      container.removeChild(existingChip);
+    } else {
+      const currentChips = container.querySelectorAll('.chip').length;
+      if (field.maxSelections && currentChips >= field.maxSelections) {
+        alert(`Solo puedes seleccionar ${field.maxSelections} elementos`);
+        return;
+      }
+      
+      this.addChip(container, value, field, false);
+    }
+    
+    this.updateChipsFormData(container, field);
+  }
+  
+  addChip(container, value, field, isCustom) {
+    console.log("clase del elmento padre", container)
+    const chip = document.createElement('div');
+    chip.className = `chip ${isCustom ? 'custom' : ''}`;
+    chip.dataset.value = value;
+    
+    const chipText = document.createElement('span');
+    chipText.textContent = value;
+    chip.appendChild(chipText);
+    
+    const removeBtn = document.createElement('span');
+    removeBtn.className = 'chip-remove';
+    removeBtn.textContent = '×';
+    removeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      container.removeChild(chip);
+      this.updateChipsFormData(container, field);
+      if (isCustom) {
+        const customInput = container.parentElement.querySelector('.custom-chip-input');
+        if (customInput) {
+          customInput.style.display = 'block';
+        }
+      }
+    });
+    
+    chip.appendChild(removeBtn);
+    if (isCustom) {
+  const chipsContainer = container.querySelector('.chips-container');
+  chipsContainer.appendChild(chip);
+  this.updateChipsFormData(chipsContainer, field);
+} else {
+  container.appendChild(chip);
+}
+
+  }
+  
+updateChipsFormData(container, field) {
+  const chips = container.querySelectorAll('.chip');
+  const values = Array.from(chips).map(chip => chip.dataset.value);
+  this.formData[field.fieldId] = values;
+  
+  // Actualizar visualmente si no cumple con el mínimo
+  if (field.minSelections && values.length < field.minSelections) {
+    container.style.border = '1px solid #ff4444';
+  } else {
+    container.style.border = '1px solid #ccc';
+  }
+}
+ createTextareaComponent(field) {
   const textarea = document.createElement('textarea');
+  textarea.classList.add("longText");
   textarea.placeholder = field.placeholder || '';
   textarea.required = field.required || false;
-  textarea.maxLength = field.maxLength || null;
+  textarea.maxLength = field.maxLength || 250;
   
    textarea.addEventListener('input', (e) => {
     const remaining = field.maxLength - e.target.value.length;
+    this.formData[field.fieldId] = e.target.value;
     if (remaining < 50) { 
       const counter = document.getElementById(`${field.question}-counter`) || 
                      document.createElement('div');
@@ -221,70 +310,35 @@ createDateRangeComponent(field) {
   }
   
   input.addEventListener('change', (e) => {
-    this.formData[field.question] = e.target.value;
+    this.formData[field.fieldId] = e.target.value;
   });
   
   container.appendChild(input);
   return container;
 }
-  toggleChip(container, value, field) {
-    const existingChip = container.querySelector(`.chip[data-value="${value}"]`);
-    
-    if (existingChip) {
-      container.removeChild(existingChip);
-    } else {
-      const currentChips = container.querySelectorAll('.chip').length;
-      if (field.maxSelections && currentChips >= field.maxSelections) {
-        alert(`Solo puedes seleccionar ${field.maxSelections} elementos`);
-        return;
-      }
-      
-      this.addChip(container, value, field, false);
-    }
-    
-    this.updateChipsFormData(container, field);
-  }
-  
-  addChip(container, value, field, isCustom) {
-    const chip = document.createElement('div');
-    chip.className = `chip ${isCustom ? 'custom' : ''}`;
-    chip.dataset.value = value;
-    
-    const chipText = document.createElement('span');
-    chipText.textContent = value;
-    chip.appendChild(chipText);
-    
-    const removeBtn = document.createElement('span');
-    removeBtn.className = 'chip-remove';
-    removeBtn.textContent = '×';
-    removeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      container.removeChild(chip);
-      this.updateChipsFormData(container, field);
-      if (isCustom) {
-        const customInput = container.parentElement.querySelector('.custom-chip-input');
-        if (customInput) {
-          customInput.style.display = 'block';
-        }
-      }
-    });
-    
-    chip.appendChild(removeBtn);
-    container.appendChild(chip);
-  }
-  
-updateChipsFormData(container, field) {
-  const chips = container.querySelectorAll('.chip');
-  const values = Array.from(chips).map(chip => chip.dataset.value);
-  this.formData[field.question] = values;
-  
-  // Actualizar visualmente si no cumple con el mínimo
-  if (field.minSelections && values.length < field.minSelections) {
-    container.style.border = '1px solid #ff4444';
-  } else {
-    container.style.border = '1px solid #ccc';
-  }
+createCheckboxComponent(field) {
+  const container = document.createElement('div');
+  container.className = 'checkbox-group';
+
+const checkboxWrapper = document.createElement('label');
+
+const checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.value = 'true';
+checkbox.checked = false; 
+
+checkbox.addEventListener('change', () => {
+  this.formData[field.fieldId] = checkbox.checked;
+});
+
+checkboxWrapper.appendChild(checkbox);
+
+container.appendChild(checkboxWrapper);
+
+  return container;
 }
+
+
   
   prevSection() {
     if (this.currentSectionIndex > 0) {
@@ -311,13 +365,13 @@ validateCurrentSection() {
   let isValid = true;
 
   currentSection.fields.forEach(field => {
-    if (field.required && !this.formData[field.question]) {
+    if (field.required && !this.formData[field.fieldId]) {
       isValid = false;
       alert(`El campo "${field.question}" es requerido`);
     }
     if (field.type === 'multiselect-chips') {
-      const currentSelections = this.formData[field.question]?.length || 0;
-      
+      const currentSelections = this.formData[field.fieldId]?.length || 0;
+      console.log("validacion chips", currentSection, this.formData[field.fieldId] );
       if (field.minSelections && currentSelections < field.minSelections) {
         isValid = false;
         alert(`Debes seleccionar al menos ${field.minSelections} habilidades`);
@@ -329,9 +383,9 @@ validateCurrentSection() {
       }
       
     }
-    if (field.type === 'daterange' && this.formData[field.question]) {
+    if (field.type === 'daterange' && this.formData[field.fieldId]) {
         const dateRegex = /^(0[1-9]|1[0-2])\/\d{4} - (0[1-9]|1[0-2])\/\d{4}$/;
-        if (!dateRegex.test(this.formData[field.question])) {
+        if (!dateRegex.test(this.formData[field.fieldId])) {
           isValid = false;
           alert(`Formato de fecha inválido. Usa MM/YYYY - MM/YYYY`);
         }
@@ -362,14 +416,18 @@ validateCurrentSection() {
 
 const modalForm = new ModalForm();
 
-document.querySelector('.ctaModalBtn').addEventListener('click', () => {
-  fetch('mock.json')
+document.querySelector('.ctaModalBtn').addEventListener('click',async () => {
+  let defaultLanguage = await localStorage.getItem("language") || 'en';
+  const languagePackage = new GetRequest(`formquestions/${defaultLanguage}`);
+  languagePackage.send()
     .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
+      if (!response) throw new Error('Network response was not ok');
+      console.log('Respuesta recibida:', response);
+      return response;
     })
     .then(data => {
-      modalForm.init(data);
+      const dataObject = data[0]
+      modalForm.init(dataObject);
       modalForm.open();
     })
     .catch(error => {
@@ -377,3 +435,14 @@ document.querySelector('.ctaModalBtn').addEventListener('click', () => {
       alert('Error al cargar el formulario');
     });
 });
+
+document.querySelector('.ctaModalBtn').addEventListener('click', () => {
+  document.querySelector('#modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+});
+
+document.querySelector('.close-btn').addEventListener('click', () => {
+  document.querySelector('#modal').classList.add('hidden');
+  document.body.style.overflow = ''; 
+});
+

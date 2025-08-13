@@ -8,16 +8,23 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&family=Open+Sans:wght@300;400&family=Roboto:wght@300&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="style/style.css" />
-    <link rel="stylesheet" href="style/modal.css" />t>
-    <script src="scripts/modal.js" defer></script>
+    <link rel="stylesheet" href="style/modal.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="scripts/modal.js"></script>
+    <script type="module" src="scripts/languages.js"></script>
     <title>UncoverPro</title>
 </head>
 <body>
+   <header class="topbar">
+  <select id="language-select" aria-label="Select language">
+    </select>
+  </header>
+  <div class="main-container">
     <section class="hero">
         <section class="leftContent">
-        <h1>Create your CV & COVER LETTER </h1>
-        <p>Quickly generate a professional CV and COVER LETTER.</p>
-        <button><a href="#" class="btn ctaModalBtn">Create my CV</a></button>
+        <h1></h1>
+        <p></p>
+        <button><a href="#" class="btn ctaModalBtn"></a></button>
         </section>
        <img 
   src="https://placehold.co/600x400"
@@ -32,7 +39,7 @@
     </section>
   <div id="modal" class="modal hidden">
   <div class="modal-content">
-    <h2 id="modal-title">Sube tu CV</h2>
+    <h2 id="modal-title"></h2>
     <div id="modal-body">
     </div>
     <div class="modal-actions">
@@ -40,6 +47,7 @@
       <button class="close-btn">Cerrar</button>
     </div>
   </div>
+</div>
 </div>
 </body>
 </html>

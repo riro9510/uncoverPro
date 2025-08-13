@@ -1,36 +1,20 @@
+import { GetRequest } from './api/typeRequest.js';
+
 let languagePackage = {};
 
-const fetchingLanguages = async (lang) => {
-    console.log('fetchingLanguages start', { lang });
-    try {
-        const currentLanguage = lang ? lang : undefined;
-        const response = await fetch(!currentLanguage ? 'http://localhost:3000/api/language':`http://localhost:3000/api/language/${currentLanguage}`); //'https://uncoverpro.onrender.com/language' : `https://uncoverpro.onrender.com/language/${currentLanguage}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const languages = await response.json();
-        console.log('fetchingLanguages end', { languages });
-        return languages;
-    } catch (error) {
-        console.error('Error fetching languages:', error);
-        console.log('fetchingLanguages end with error', { error });
-        return [];
-    }
-}
-
 const languagesSelector = async () => {
-    console.log('languagesSelector start');
+    console.log('5️⃣ languagesSelector start');
     const languageSelect = document.getElementById('language-select');
     if (!languageSelect) {
-        console.log('languagesSelector end: no languageSelect');
+        console.log('5️⃣❌ languagesSelector end: no languageSelect');
         return;
     }
-
-    const languages = await fetchingLanguages();
-    console.log('languagesSelector languages', { languages });
+    const listLanguagesRequest = new GetRequest('language');
+    const languages = await listLanguagesRequest.send();
+    console.log('6️⃣ languagesSelector languages', { languages });
     if (languages.length === 0) {
         console.error('No languages found');
-        console.log('languagesSelector end: no languages');
+        console.log('6️⃣❌ languagesSelector end: no languages');
         return;
     }
     languages.forEach(language => {
@@ -39,17 +23,21 @@ const languagesSelector = async () => {
         option.textContent = language.name;
         languageSelect.appendChild(option);
     });
-    console.log('languagesSelector end');
+    console.log('7️⃣ languagesSelector end');
 }
 
 const loadingLanguages = async () => {
-    console.log('loadingLanguages start');
+    console.log('1️⃣ loadingLanguages start');
     let defaultLanguage = await localStorage.getItem("language") || 'en';
-    const languageSelect = await fetchingLanguages(defaultLanguage);
-    console.log('loadingLanguages languageSelect', { languageSelect });
+    const gettingLanguageSelected = new GetRequest(`language/${defaultLanguage}`);
+    const languageSelect = await gettingLanguageSelected.send();
+    console.log('4️⃣ loadingLanguages languageSelect', { languageSelect });
+    const isRtl = languageSelect["isRTL"] || false;
+    document.documentElement.setAttribute('dir', isRtl ? 'rtl' : 'ltr');
     languagePackage = languageSelect["translations"];
-    if (languageSelect.length > 0) {
-        await languagesSelector();
+    console.log("extracted languagePackage", { languagePackage });  
+    if (languagePackage) {
+        await languagesSelector(); 
         const languageSelectElement = document.getElementById('language-select');
         if (languageSelectElement) {
             languageSelectElement.value = defaultLanguage;
@@ -62,23 +50,25 @@ const loadingLanguages = async () => {
     } else {
         console.error('No languages available to load');
     }
-    console.log('loadingLanguages end');
+    console.log('8️⃣ loadingLanguages end');
 }
 
 const initialLoading = async () => {
-    console.log('initialLoading start');
-    await loadingLanguages();
+    console.log('0️⃣ initialLoading start');
+    await loadingLanguages(); // → 1️⃣ al 8️⃣
     const heroTitle = document.querySelector('.hero h1');
     const heroText = document.querySelector('.hero p');
     const heroButton = document.querySelector('.ctaModalBtn');
 
-    console.log('initialLoading languagePackage', { languagePackage });
+    console.log('9️⃣ initialLoading languagePackage', languagePackage,languagePackage.h1, languagePackage.subtitle, languagePackage.cta );
 
-    if (heroTitle) heroTitle.textContent = languagePackage['h1'] || 'Create your CV & COVER LETTER';
-    if (heroText) heroText.textContent = languagePackage['p'] || 'Quickly generate a professional CV and COVER LETTER.';
-    if (heroButton) heroButton.textContent = languagePackage['cta'] || 'Get Started';
+    if (heroTitle) heroTitle.textContent = languagePackage.hero.h1 || 'Create your CV & COVER LETTER';
+    if (heroText) heroText.textContent = languagePackage.hero.subtitle|| 'Quickly generate a professional CV and COVER LETTER.';
+    if (heroButton) heroButton.textContent = languagePackage.hero.cta || 'Get Started';
 
-    console.log('initialLoading end');
+    console.log('🔟 initialLoading end');
 }
 
-initialLoading();
+document.addEventListener('DOMContentLoaded', () => {
+    initialLoading(); // → 0️⃣
+});
