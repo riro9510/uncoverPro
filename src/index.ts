@@ -51,9 +51,9 @@ app.use('/api', router);
 app.use('/temp', express.static(PUBLIC_DIR));
 app.get('/download/:filename', (req, res) => {
   const filePath = path.join(PUBLIC_DIR, req.params.filename);
-  
+
   if (fs.existsSync(filePath)) {
-    res.download(filePath, err => {
+    res.download(filePath, (err) => {
       if (err) {
         console.error('Download error:', err);
         res.status(500).send('Error downloading file');
@@ -86,9 +86,9 @@ wss.on('connection', (ws) => {
       console.log('📝 Payload parsed', payload);
 
       const cvFilename = `cv_${Date.now()}.pdf`;
-const letterFilename = `letter_${Date.now()}.pdf`;
+      const letterFilename = `letter_${Date.now()}.pdf`;
 
-      await generateCV(payload, path.join(PUBLIC_DIR, cvFilename));   
+      await generateCV(payload, path.join(PUBLIC_DIR, cvFilename));
       console.log('📄 CV generated');
 
       await generateCoverLetter(payload, path.join(PUBLIC_DIR, letterFilename));
@@ -117,6 +117,6 @@ const letterFilename = `letter_${Date.now()}.pdf`;
 // --- Iniciar servidor HTTP + WebSocket ---
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor HTTP/WebSocket escuchando en puerto ${PORT}`);
-   console.log(`Temp files directory: ${PUBLIC_DIR}`);
+  console.log(`Temp files directory: ${PUBLIC_DIR}`);
 });
 export default app;
