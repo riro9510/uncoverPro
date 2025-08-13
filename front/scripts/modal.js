@@ -514,25 +514,41 @@ handleDownload() {
   console.log("Download URLs:", this.cvUrl, this.letterUrl);
   
   const downloadFile = (url, filename) => {
-    // Usa window.open para forzar la descarga
-    window.open(url, '_blank');
-    
-    // Opcional: solución alternativa para navegadores que bloquean popups
-    const link = document.createElement('a');
-    link.href = url;
-    link.target = '_blank';
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    }, 100);
+    // Solución principal con manejo de errores
+    try {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      link.target = '_blank'; // Para evitar problemas con popup blockers
+      
+      // Solución alternativa si falla la descarga automática
+      link.onclick = () => {
+        setTimeout(() => {
+          if (!document.body.contains(link)) {
+            window.open(url, '_blank');
+          }
+        }, 200);
+      };
+
+      document.body.appendChild(link);
+      link.click();
+      
+      // Limpieza después del click
+      setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }, 500);
+    } catch (error) {
+      console.error('Error en descarga:', error);
+      window.open(url, '_blank');
+    }
   };
 
-  downloadFile(this.cvUrl, 'cv.pdf');
-  downloadFile(this.letterUrl, 'coverLetter.pdf');
-   //alert('Descargando archivos...');
+  // Descargar ambos archivos
+  downloadFile(this.cvUrl, `CV_${new Date().toISOString().slice(0,10)}.pdf`);
+  downloadFile(this.letterUrl, `CartaPresentacion_${new Date().toISOString().slice(0,10)}.pdf`);
+  
+  //alert('Descargando archivos...');
   //this.close();
 }
 

@@ -10,15 +10,15 @@ const HEADER_FONT_SIZE = 16;
 const SECTION_TITLE_FONT_SIZE = 12;
 const TEXT_FONT_SIZE = 10;
 
-export function generateCV(data: FormRequest, outputPath: string): Promise<string> {
+export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
-    const stream = fs.createWriteStream(outputPath);
-
-    stream.on('finish', () => resolve(outputPath));
-    stream.on('error', (err) => reject(err));
-
-    doc.pipe(stream);
+    const chunks: Buffer[] = [];
+    
+    // Recolectar chunks del PDF en memoria
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
 
     // Encabezado
     doc
@@ -82,15 +82,14 @@ export function generateCV(data: FormRequest, outputPath: string): Promise<strin
   });
 }
 
-export function generateCoverLetter(data: FormRequest, outputPath: string): Promise<string> {
+export function generateCoverLetterBuffer(data: FormRequest): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50 });
-    const stream = fs.createWriteStream(outputPath);
+    const chunks: Buffer[] = [];
 
-    stream.on('finish', () => resolve(outputPath));
-    stream.on('error', (err) => reject(err));
-
-    doc.pipe(stream);
+    doc.on('data', (chunk) => chunks.push(chunk));
+    doc.on('end', () => resolve(Buffer.concat(chunks)));
+    doc.on('error', reject);
 
     const currentDate = new Date().toLocaleDateString();
 

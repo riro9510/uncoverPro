@@ -7,8 +7,9 @@ import fs from 'fs';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import https from 'http';
-import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
+import { generateCoverLetterBuffer, generateCVBuffer } from './services/pdfGenerator.js';
 import { fileURLToPath } from 'url';
+import { FormRequest } from './models/formRequestInterface.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -64,6 +65,27 @@ app.get('/download/:filename', (req, res) => {
   }
 });
 
+app.get('/generate-pdf', async (req, res) => {
+  try {
+    const { type, ...queryParams } = req.query;
+    const filename = `${type}_${Date.now()}.pdf`;
+    const filePath = path.join(PUBLIC_DIR, filename);
+
+    const payload = queryParams as unknown as FormRequest;
+    
+    const pdfBuffer = type === 'cv' 
+      ? await generateCVBuffer(payload)
+      : await generateCoverLetterBuffer(payload);
+
+    await fs.promises.writeFile(filePath, pdfBuffer);
+
+    res.download(filePath, () => {
+      setTimeout(() => fs.unlink(filePath, () => {}), 50000);
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
 /*app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });*/
@@ -77,41 +99,31 @@ const server = https.createServer(app);
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws) => {
-  console.log('✅ Client connected');
-
   ws.on('message', async (msg) => {
-    console.log('📨 Message received');
     try {
       const payload = JSON.parse(msg.toString());
-      console.log('📝 Payload parsed', payload);
+      const baseUrl = process.env.NODE_ENV === 'production'
+        ? 'https://uncoverpro.onrender.com'
+        : `http://localhost:${PORT}`;
 
-      const cvFilename = `cv_${Date.now()}.pdf`;
-      const letterFilename = `letter_${Date.now()}.pdf`;
+      if (!payload['personal_info.full_name']) {
+        throw new Error('Faltan datos requeridos');
+      }
 
-      await generateCV(payload, path.join(PUBLIC_DIR, cvFilename));
-      console.log('📄 CV generated');
-
-      await generateCoverLetter(payload, path.join(PUBLIC_DIR, letterFilename));
-      console.log('📄 Cover letter generated');
-
-      ws.send(
-        JSON.stringify({
-          type: 'ready',
-          cvUrl: '/download/cv.pdf',
-          letterUrl: '/download/coverLetter.pdf',
-        })
-      );
-      console.log('✅ Ready sent');
+      ws.send(JSON.stringify({
+        type: 'ready',
+        cvUrl: `${baseUrl}/generate-pdf?type=cv&${new URLSearchParams(payload)}`,
+        letterUrl: `${baseUrl}/generate-pdf?type=cover-letter&${new URLSearchParams(payload)}`
+      }));
     } catch (err: any) {
-      console.error('❌ WS handler error:', err);
-      try {
-        ws.send(JSON.stringify({ type: 'error', message: err.message }));
-      } catch (_) {}
+      console.error('❌ WS error:', err);
+      ws.send(JSON.stringify({ 
+        type: 'error', 
+        message: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      }));
     }
   });
-
-  ws.on('close', () => console.log('⚠️ Client disconnected'));
-  ws.on('error', (err) => console.error('❌ WS error:', err));
 });
 
 // --- Iniciar servidor HTTP + WebSocket ---
