@@ -511,20 +511,21 @@ resetToFormState() {
 }
 
 handleDownload() {
+  console.log("url donde se intenta descargar",this.cvUrl,this.letterUrl);
   const downloadFile = (url, filename) => {
     const link = document.createElement('a');
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);
+    console.log("link",link);
     link.click();
-    console.log("url donde se intenta descargar", link,)
     document.body.removeChild(link);
   };
 
   downloadFile(this.cvUrl, 'cv.pdf');
   downloadFile(this.letterUrl, 'coverLetter.pdf');
 
-  alert('Descargando archivos...');
+  //alert('Descargando archivos...');
   //this.close();
 }
 
