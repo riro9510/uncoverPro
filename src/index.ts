@@ -13,7 +13,11 @@ import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
 //const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(express.static(path.join(process.cwd(), 'public')));
+const PUBLIC_DIR = process.env.NODE_ENV === 'production'
+  ? path.join(process.cwd(), 'dist', 'public') 
+  : path.join(process.cwd(), 'public');       
+
+app.use(express.static(PUBLIC_DIR));
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 //const frontendPath = path.join(__dirname, '../front');
 
@@ -65,8 +69,8 @@ wss.on('connection', (ws) => {
       const payload = JSON.parse(msg.toString());
       console.log('📝 Payload parsed', payload);
 
-      const cvPath = path.join('public', 'cv.pdf');
-      const letterPath = path.join('public', 'coverLetter.pdf');
+      const cvPath = path.join(PUBLIC_DIR, 'cv.pdf');
+      const letterPath = path.join(PUBLIC_DIR, 'coverLetter.pdf');
 
       await generateCV(payload, cvPath);
       console.log('📄 CV generated');
