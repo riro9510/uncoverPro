@@ -1,8 +1,8 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
 import path from 'path';
-import { FormRequest } from 'src/models/formRequestInterface.js';
-import { getCoverLetterTexts, getSectionTitles } from 'src/utils/language.utils.js';
+import { FormRequest } from '../models/formRequestInterface.js';
+import { getCoverLetterTexts, getSectionTitles } from '../utils/language.utils.js';
 
 // Colores y tipografía base
 const PRIMARY_COLOR = '#003366';
