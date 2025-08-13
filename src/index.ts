@@ -3,6 +3,7 @@ import router from './routes/index.routes.js';
 import 'dotenv/config';
 import { connectDB } from './config/database.js';
 import path from 'path';
+import fs from 'fs';
 import cors from 'cors';
 import { WebSocketServer } from 'ws';
 import http from 'http';
@@ -10,11 +11,13 @@ import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
 //import { fileURLToPath } from 'url';
 
 //const __filename = fileURLToPath(import.meta.url);
-//const __dirname = path.dirname(__filename);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-const PUBLIC_DIR =
-  process.env.NODE_ENV === 'production' ? '/tmp' : path.join(process.cwd(), 'public');
+const PUBLIC_DIR = path.join(__dirname, 'temp');
+if (!fs.existsSync(PUBLIC_DIR)) {
+  fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+}
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 //const frontendPath = path.join(__dirname, '../front');
@@ -45,16 +48,20 @@ app.use(
 app.use(express.json());
 //app.use(express.static(frontendPath));
 app.use('/api', router);
-app.use(
-  express.static(PUBLIC_DIR, {
-    setHeaders: (res, filePath) => {
-      console.log(`📄 Serving file: ${filePath}`);
-    },
-  })
-);
-app.use((req, res, next) => {
-  console.log(`🔍 Incoming request: ${req.method} ${req.url}`);
-  next();
+app.use('/temp', express.static(PUBLIC_DIR));
+app.get('/download/:filename', (req, res) => {
+  const filePath = path.join(PUBLIC_DIR, req.params.filename);
+  
+  if (fs.existsSync(filePath)) {
+    res.download(filePath, err => {
+      if (err) {
+        console.error('Download error:', err);
+        res.status(500).send('Error downloading file');
+      }
+    });
+  } else {
+    res.status(404).send('File not found');
+  }
 });
 
 /*app.get('*', (req, res) => {
@@ -78,20 +85,20 @@ wss.on('connection', (ws) => {
       const payload = JSON.parse(msg.toString());
       console.log('📝 Payload parsed', payload);
 
-      const cvPath = path.join(PUBLIC_DIR, 'cv.pdf');
-      const letterPath = path.join(PUBLIC_DIR, 'coverLetter.pdf');
+      const cvFilename = `cv_${Date.now()}.pdf`;
+const letterFilename = `letter_${Date.now()}.pdf`;
 
-      await generateCV(payload, cvPath);
+      await generateCV(payload, path.join(PUBLIC_DIR, cvFilename));   
       console.log('📄 CV generated');
 
-      await generateCoverLetter(payload, letterPath);
+      await generateCoverLetter(payload, path.join(PUBLIC_DIR, letterFilename));
       console.log('📄 Cover letter generated');
 
       ws.send(
         JSON.stringify({
           type: 'ready',
-          cvUrl: '/cv.pdf',
-          letterUrl: '/coverLetter.pdf',
+          cvUrl: '/download/cv.pdf',
+          letterUrl: '/download/coverLetter.pdf',
         })
       );
       console.log('✅ Ready sent');
@@ -110,5 +117,6 @@ wss.on('connection', (ws) => {
 // --- Iniciar servidor HTTP + WebSocket ---
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor HTTP/WebSocket escuchando en puerto ${PORT}`);
+   console.log(`Temp files directory: ${PUBLIC_DIR}`);
 });
 export default app;
