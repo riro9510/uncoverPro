@@ -1,4 +1,4 @@
-import { LanguageCode } from "src/models/formRequestInterface.js";
+import { LanguageCode } from "../models/formRequestInterface.js";
 
 function getSectionTitles(languageCode: LanguageCode) {
   const sectionTitles = {
