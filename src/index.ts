@@ -67,62 +67,56 @@ app.get('/download/:filename', (req, res) => {
 });
 
 app.get('/generate-zip', async (req, res) => {
+  // Cabeceras CORS explícitas para GitHub Pages
+  res.header('Access-Control-Allow-Origin', 'https://riro9510.github.io');
+  res.header('Access-Control-Allow-Methods', 'GET');
+
   try {
     const queryParams = req.query as unknown as FormRequest;
     
-    // Generar buffers directamente
+    // Validación básica de parámetros
+    if (!queryParams['personal_info.full_name']) {
+      throw new Error('Datos incompletos');
+    }
+
+    // Generación concurrente de PDFs
     const [cvBuffer, letterBuffer] = await Promise.all([
       generateCVBuffer(queryParams),
       generateCoverLetterBuffer(queryParams)
     ]);
 
-    // Configuración crítica de headers ANTES de cualquier escritura
-    res.writeHead(200, {
-      'Content-Type': 'application/zip',
-      'Content-Disposition': `attachment; filename=Documentos_${Date.now()}.zip`,
-      'Connection': 'close'
-    });
+    // Configuración de respuesta
+    res.header('Content-Type', 'application/zip');
+    res.header('Content-Disposition', `attachment; filename=Documentos_${Date.now()}.zip`);
+    res.header('Cache-Control', 'no-store');
 
-    // Archiver configurado para máxima compatibilidad
-    const archive = archiver('zip', {
-      zlib: { level: 1 } // Nivel bajo para velocidad
-    });
-
-    // Manejo de errores explosivos
-    archive.on('warning', (err) => {
-      if (err.code === 'ENOENT') {
-        console.warn('Warning archiver:', err);
-      } else {
-        throw err;
-      }
+    const archive = archiver('zip', { 
+      zlib: { level: 1 },
+      forceLocalTime: true // Para compatibilidad de tiempos en ZIP
     });
 
     archive.on('error', (err) => {
       console.error('Archiver error:', err);
       if (!res.headersSent) {
-        res.writeHead(500, { 'Connection': 'close' });
-        res.end(JSON.stringify({ error: 'Failed to create zip' }));
+        res.status(500).json({ error: 'Error creating ZIP file' });
       }
     });
 
-    // Pipeline directo SIN buffers intermedios
     archive.pipe(res);
-
-    // Añadir archivos con nombres compatibles
-    archive.append(cvBuffer, { name: 'CV.pdf' });
-    archive.append(letterBuffer, { name: 'Cover_Letter.pdf' });
-
-    // Cierre forzoso con timeout de emergencia
-    await archive.finalize();
     
-  } catch (err:any) {
-    console.error('‼️ CRITICAL ZIP ERROR:', err);
+    // Añadimos los PDFs con nombres amigables
+    archive.append(cvBuffer, { name: 'CV_UncoverPro.pdf' });
+    archive.append(letterBuffer, { name: 'Carta_Presentacion.pdf' });
+
+    await archive.finalize();
+
+  } catch (err: any) {
+    console.error('‼️ ZIP Error:', err.message);
     if (!res.headersSent) {
-      res.writeHead(500, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ 
-        error: 'Failed to generate documents',
-        details: process.env.NODE_ENV === 'development' ? err.message : null
-      }));
+      res.status(500).json({ 
+        error: 'Error al generar documentos',
+        ...(process.env.NODE_ENV === 'development' && { details: err.message })
+      });
     }
   }
 });
@@ -143,19 +137,22 @@ wss.on('connection', (ws) => {
   ws.on('message', async (msg) => {
     try {
       const payload = JSON.parse(msg.toString());
-      const baseUrl =
-        process.env.NODE_ENV === 'production'
-          ? 'https://uncoverpro.onrender.com'
-          : `http://localhost:${PORT}`;
+      // Hardcodeamos la URL de producción siempre para el frontend
+      const baseUrl = 'https://uncoverpro.onrender.com'; 
 
       if (!payload['personal_info.full_name']) {
         throw new Error('Faltan datos requeridos');
       }
 
+      // Codificación robusta de parámetros
+      const queryString = Object.entries(payload)
+        .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(val))}`)
+        .join('&');
+
       ws.send(
         JSON.stringify({
           type: 'ready',
-          zipUrl: `${baseUrl}/generate-zip?${new URLSearchParams(payload)}&t=${Date.now()}`
+          zipUrl: `${baseUrl}/generate-zip?${queryString}&t=${Date.now()}`
         })
       );
     } catch (err: any) {
@@ -163,7 +160,7 @@ wss.on('connection', (ws) => {
       ws.send(
         JSON.stringify({
           type: 'error',
-          message: err.message,
+          message: 'Error al generar enlace de descarga', // Mensaje genérico para producción
           stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
         })
       );
