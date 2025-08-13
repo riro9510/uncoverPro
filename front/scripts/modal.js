@@ -452,7 +452,8 @@ validateCurrentSection() {
     client.connect()
       .then(() => {
         console.log('✅ Conexión establecida');
-        const isRtl = document.documentElement.getAttribute('dir') === 'rtl';
+        const rtl = document.documentElement.getAttribute('dir') ;
+        const isRtl = rtl == 'rtl';
         const finalJson = {...this.formData,code:languageSelected,rtl:isRtl}
         jsonEnviado = finalJson;
         client.sendJSON(finalJson); 
@@ -519,8 +520,7 @@ handleDownload() {
  if (!this.zipUrl || this.zipUrl.includes('undefined')) {
     console.error('‼️ ERROR: URL mal formada', this.zipUrl);
     
-    // Reconstruye la URL manualmente si es necesario
-    const params = new URLSearchParams(jsonEnviado); // Asegúrate que this.formData existe
+    const params = new URLSearchParams(jsonEnviado); 
     const reconstructedUrl = `https://uncoverpro.onrender.com/generate-zip?${params.toString()}`;
     
     console.log('URL reconstruida:', reconstructedUrl);
@@ -528,7 +528,7 @@ handleDownload() {
     return;
   }
 
-  // 2. Descarga normal si la URL es válida
+
   const link = document.createElement('a');
   link.href = this.zipUrl;
   link.download = `Documentos_${new Date().toISOString().split('T')[0]}.zip`;
@@ -539,8 +539,8 @@ handleDownload() {
   link.click();
   document.body.removeChild(link);
 
-  //alert('Descargando archivos...');
-  //this.close();
+  alert('Descargando archivos...');
+  this.close();
 }
 
 

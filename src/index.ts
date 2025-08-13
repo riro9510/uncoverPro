@@ -137,14 +137,12 @@ wss.on('connection', (ws) => {
   ws.on('message', async (msg) => {
     try {
       const payload = JSON.parse(msg.toString());
-      // Hardcodeamos la URL de producción siempre para el frontend
       const baseUrl = 'https://uncoverpro.onrender.com'; 
 
       if (!payload['personal_info.full_name']) {
         throw new Error('Faltan datos requeridos');
       }
 
-      // Codificación robusta de parámetros
       const queryString = Object.entries(payload)
         .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(val))}`)
         .join('&');
@@ -160,7 +158,7 @@ wss.on('connection', (ws) => {
       ws.send(
         JSON.stringify({
           type: 'error',
-          message: 'Error al generar enlace de descarga', // Mensaje genérico para producción
+          message: 'Error al generar enlace de descarga', 
           stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
         })
       );
@@ -168,7 +166,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-// --- Iniciar servidor HTTP + WebSocket ---
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor HTTP/WebSocket escuchando en puerto ${PORT}`);
   console.log(`Temp files directory: ${PUBLIC_DIR}`);
