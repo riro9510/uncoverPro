@@ -515,42 +515,28 @@ resetToFormState() {
 }
 
 handleDownload() {
-  // Solución nuclear para navegadores modernos
-  const downloadBlob = (url, filename) => {
-    fetch(url)
-      .then(res => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.blob();
-      })
-      .then(blob => {
-        // Crear link de descarga
-        const blobUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = blobUrl;
-        a.download = filename || 'documentos.zip';
-        
-        // Disparar evento
-        document.body.appendChild(a);
-        a.click();
-        
-        // Limpieza agresiva
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(blobUrl);
-        }, 100);
-      })
-      .catch(err => {
-        console.error('‼️ Fallback to window.open');
-        window.open(url, '_blank');
-      });
-  };
+ if (!this.zipUrl || this.zipUrl.includes('undefined')) {
+    console.error('‼️ ERROR: URL mal formada', this.zipUrl);
+    
+    // Reconstruye la URL manualmente si es necesario
+    const params = new URLSearchParams(this.formData); // Asegúrate que this.formData existe
+    const reconstructedUrl = `https://uncoverpro.onrender.com/generate-zip?${params.toString()}`;
+    
+    console.log('URL reconstruida:', reconstructedUrl);
+    window.open(reconstructedUrl, '_blank');
+    return;
+  }
 
-  // Ejecutar con nombre personalizado
-  downloadBlob(
-    this.zipUrl,
-    `Documentos_${new Date().toISOString().split('T')[0]}.zip`
-  );
+  // 2. Descarga normal si la URL es válida
+  const link = document.createElement('a');
+  link.href = this.zipUrl;
+  link.download = `Documentos_${new Date().toISOString().split('T')[0]}.zip`;
+  link.target = '_blank';
+  link.style.display = 'none';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   //alert('Descargando archivos...');
   //this.close();
