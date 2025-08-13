@@ -515,16 +515,42 @@ resetToFormState() {
 }
 
 handleDownload() {
-  console.log("Download ZIP URL:", this.zipUrl);
+  // Solución nuclear para navegadores modernos
+  const downloadBlob = (url, filename) => {
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.blob();
+      })
+      .then(blob => {
+        // Crear link de descarga
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = blobUrl;
+        a.download = filename || 'documentos.zip';
+        
+        // Disparar evento
+        document.body.appendChild(a);
+        a.click();
+        
+        // Limpieza agresiva
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(blobUrl);
+        }, 100);
+      })
+      .catch(err => {
+        console.error('‼️ Fallback to window.open');
+        window.open(url, '_blank');
+      });
+  };
 
-  const link = document.createElement('a');
-  link.href = this.zipUrl;
-  link.download = `Documentos_${new Date().toISOString().slice(0, 10)}.zip`;
-  link.target = '_blank';
-  
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  // Ejecutar con nombre personalizado
+  downloadBlob(
+    this.zipUrl,
+    `Documentos_${new Date().toISOString().split('T')[0]}.zip`
+  );
 
   //alert('Descargando archivos...');
   //this.close();

@@ -69,34 +69,61 @@ app.get('/download/:filename', (req, res) => {
 app.get('/generate-zip', async (req, res) => {
   try {
     const queryParams = req.query as unknown as FormRequest;
-    const filename = `documents_${Date.now()}.zip`;
-    const filePath = path.join(PUBLIC_DIR, filename);
+    
+    // Generar buffers directamente
+    const [cvBuffer, letterBuffer] = await Promise.all([
+      generateCVBuffer(queryParams),
+      generateCoverLetterBuffer(queryParams)
+    ]);
 
-    // Generar ambos PDFs
-    const cvBuffer = await generateCVBuffer(queryParams);
-    const letterBuffer = await generateCoverLetterBuffer(queryParams);
+    // Configuración crítica de headers ANTES de cualquier escritura
+    res.writeHead(200, {
+      'Content-Type': 'application/zip',
+      'Content-Disposition': `attachment; filename=Documentos_${Date.now()}.zip`,
+      'Connection': 'close'
+    });
 
-    // Crear archivo ZIP temporal
-    const output = fs.createWriteStream(filePath);
-    const archive = archiver('zip', { zlib: { level: 9 } });
+    // Archiver configurado para máxima compatibilidad
+    const archive = archiver('zip', {
+      zlib: { level: 1 } // Nivel bajo para velocidad
+    });
 
-    output.on('close', () => {
-      res.download(filePath, () => {
-        setTimeout(() => fs.unlink(filePath, () => {}), 50000);
-      });
+    // Manejo de errores explosivos
+    archive.on('warning', (err) => {
+      if (err.code === 'ENOENT') {
+        console.warn('Warning archiver:', err);
+      } else {
+        throw err;
+      }
     });
 
     archive.on('error', (err) => {
-      throw err;
+      console.error('Archiver error:', err);
+      if (!res.headersSent) {
+        res.writeHead(500, { 'Connection': 'close' });
+        res.end(JSON.stringify({ error: 'Failed to create zip' }));
+      }
     });
 
-    archive.pipe(output);
-    archive.append(cvBuffer, { name: 'CV.pdf' });
-    archive.append(letterBuffer, { name: 'CartaPresentacion.pdf' });
-    await archive.finalize();
+    // Pipeline directo SIN buffers intermedios
+    archive.pipe(res);
 
-  } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    // Añadir archivos con nombres compatibles
+    archive.append(cvBuffer, { name: 'CV.pdf' });
+    archive.append(letterBuffer, { name: 'Cover_Letter.pdf' });
+
+    // Cierre forzoso con timeout de emergencia
+    await archive.finalize();
+    
+  } catch (err:any) {
+    console.error('‼️ CRITICAL ZIP ERROR:', err);
+    if (!res.headersSent) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ 
+        error: 'Failed to generate documents',
+        details: process.env.NODE_ENV === 'development' ? err.message : null
+      }));
+    }
   }
 });
 
@@ -128,7 +155,7 @@ wss.on('connection', (ws) => {
       ws.send(
         JSON.stringify({
           type: 'ready',
-          zipUrl: `${baseUrl}/generate-zip?${new URLSearchParams(payload)}`
+          zipUrl: `${baseUrl}/generate-zip?${new URLSearchParams(payload)}&t=${Date.now()}`
         })
       );
     } catch (err: any) {
