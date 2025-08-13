@@ -1,4 +1,5 @@
 import { GetRequest } from "./api/typeRequest.js";
+import { WebSocketClient } from "./api/webSocket.js";
 
 class ModalForm {
   constructor() {
@@ -405,13 +406,88 @@ validateCurrentSection() {
     document.body.style.overflow = '';
   }
   
-  submitForm() {
+  /*submitForm() {
     if (this.validateCurrentSection()) {
       console.log('Formulario completo enviado:', this.formData);
       alert('Formulario enviado con éxito!');
       this.close();
     }
+  }*/
+
+  async submitForm() {
+  if (!this.validateCurrentSection()) return;
+
+  // Mostrar spinner
+  this.showLoadingState();
+
+  try {
+    const client = new WebSocketClient('ws://localhost:3000');
+    client.connect().then(()=>{
+      client.sendJSON(this.formData);
+    }).catch(err => console.error('Error conecting to WS', err));
+    
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Cambiar a estado de descarga
+    this.showDownloadState();
+  } catch (error) {
+    console.error('Error al procesar:', error);
+    this.resetToFormState();
+    alert('Error al procesar el formulario');
   }
+}
+  showLoadingState() {
+  this.modalBody.innerHTML = `
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Procesando tu información...</p>
+    </div>
+  `;
+  
+  // Ocultar botones de navegación temporalmente
+  this.modalActions.style.visibility = 'hidden';
+}
+
+showDownloadState() {
+  this.modalBody.innerHTML = `
+    <div class="success-state">
+      <svg viewBox="0 0 24 24" width="64" height="64" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+      </svg>
+      <p>¡Proceso completado!</p>
+      <p>Ahora puedes descargar tu información</p>
+    </div>
+  `;
+  
+  // Mostrar solo el botón de descarga
+  this.modalActions.innerHTML = '';
+  const downloadBtn = document.createElement('button');
+  downloadBtn.className = 'download-btn';
+  downloadBtn.textContent = 'Descargar';
+  downloadBtn.addEventListener('click', () => this.handleDownload());
+  this.modalActions.appendChild(downloadBtn);
+  this.modalActions.style.visibility = 'visible';
+  
+  // También puedes agregar el botón de cerrar si lo necesitas
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'close-btn';
+  closeBtn.textContent = 'Cerrar';
+  closeBtn.addEventListener('click', () => this.close());
+  this.modalActions.appendChild(closeBtn);
+}
+
+resetToFormState() {
+  this.renderCurrentSection();
+  this.setupNavigation();
+}
+
+handleDownload() {
+  // Implementa tu lógica de descarga aquí
+  console.log('Descargando datos:', this.formData);
+  alert('Iniciando descarga...');
+  this.close();
+}
 }
 
 const modalForm = new ModalForm();
@@ -441,8 +517,4 @@ document.querySelector('.ctaModalBtn').addEventListener('click', () => {
   document.body.style.overflow = 'hidden';
 });
 
-document.querySelector('.close-btn').addEventListener('click', () => {
-  document.querySelector('#modal').classList.add('hidden');
-  document.body.style.overflow = ''; 
-});
 
