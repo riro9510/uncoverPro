@@ -68,21 +68,13 @@ app.get('/download/:filename', (req, res) => {
 
 app.get('/generate-both', async (req, res) => {
   try {
-    // Recibimos el payload de la query
     const queryParams = req.query as unknown as FormRequest;
-
-    // Generar ambos PDFs en memoria
     const cvBuffer = await generateCVBuffer(queryParams);
     const letterBuffer = await generateCoverLetterBuffer(queryParams);
 
-    // Configurar headers para ZIP
     res.setHeader('Content-Type', 'application/zip');
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=Documentos_${Date.now()}.zip`
-    );
+    res.setHeader('Content-Disposition', `attachment; filename=Documentos_${Date.now()}.zip`);
 
-    // Crear el zip y enviarlo en streaming
     const archive = archiver('zip', { zlib: { level: 9 } });
     archive.pipe(res);
 
@@ -95,6 +87,7 @@ app.get('/generate-both', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 /*app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
 });*/
@@ -111,27 +104,30 @@ wss.on('connection', (ws) => {
   ws.on('message', async (msg) => {
     try {
       const payload = JSON.parse(msg.toString());
-      const baseUrl = process.env.NODE_ENV === 'production'
-        ? 'https://uncoverpro.onrender.com'
-        : `http://localhost:${PORT}`;
+      const baseUrl =
+        process.env.NODE_ENV === 'production'
+          ? 'https://uncoverpro.onrender.com'
+          : `http://localhost:${PORT}`;
 
       if (!payload['personal_info.full_name']) {
         throw new Error('Faltan datos requeridos');
       }
 
-       ws.send(JSON.stringify({
-      type: 'ready',
-      zipUrl: `${baseUrl}/generate-both?${new URLSearchParams(payload)}`
-    }));
-
-
+      ws.send(
+        JSON.stringify({
+          type: 'ready',
+          zipUrl: `${baseUrl}/generate-both?${new URLSearchParams(payload)}`,
+        })
+      );
     } catch (err: any) {
       console.error('❌ WS error:', err);
-      ws.send(JSON.stringify({ 
-        type: 'error', 
-        message: err.message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: err.message,
+          stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+        })
+      );
     }
   });
 });

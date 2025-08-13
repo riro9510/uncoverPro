@@ -1,6 +1,6 @@
 export interface FormRequest {
-  'rtl': boolean;
-  'code': LanguageCode;
+  rtl: boolean;
+  code: LanguageCode;
   'personal_info.full_name': string;
   'personal_info.professional_title': string;
   'personal_info.email': string;
@@ -26,16 +26,16 @@ export interface FormRequest {
 
   'availability.immediate'?: boolean;
 }
-export type LanguageCode = 
-  | 'es'  
-  | 'en'  
-  | 'fr' 
-  | 'de'  
-  | 'it'  
-  | 'pt'  
-  | 'zh'  
-  | 'ja'  
-  | 'hi'  
-  | 'fa'  
-  | 'ar'  
-  | 'ru'; 
+export type LanguageCode =
+  | 'es'
+  | 'en'
+  | 'fr'
+  | 'de'
+  | 'it'
+  | 'pt'
+  | 'zh'
+  | 'ja'
+  | 'hi'
+  | 'fa'
+  | 'ar'
+  | 'ru';
