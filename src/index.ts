@@ -13,11 +13,11 @@ import { generateCoverLetter, generateCV } from './services/pdfGenerator.js';
 //const __dirname = path.dirname(__filename);
 
 const app = express();
-const PUBLIC_DIR = process.env.NODE_ENV === 'production'
-  ? path.join(process.cwd(), 'dist', 'public') 
-  : path.join(process.cwd(), 'public');       
+const PUBLIC_DIR =
+  process.env.NODE_ENV === 'production'
+    ? '/tmp'
+    : path.join(process.cwd(), 'public');
 
-app.use(express.static(PUBLIC_DIR));
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 10000;
 //const frontendPath = path.join(__dirname, '../front');
 
@@ -47,6 +47,16 @@ app.use(
 app.use(express.json());
 //app.use(express.static(frontendPath));
 app.use('/api', router);
+app.use(express.static(PUBLIC_DIR, {
+  setHeaders: (res, filePath) => {
+    console.log(`📄 Serving file: ${filePath}`);
+  }
+}));
+app.use((req, res, next) => {
+  console.log(`🔍 Incoming request: ${req.method} ${req.url}`);
+  next();
+});
+
 
 /*app.get('*', (req, res) => {
   res.sendFile(path.join(frontendPath, 'index.html'));
