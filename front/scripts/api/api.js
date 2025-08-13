@@ -1,6 +1,6 @@
 
 
-const env = "prod";
+const env = "dev";
 const baseURL = (env == "prod"
   ? 'https://uncoverpro.onrender.com/api' 
   : 'http://localhost:3000/api');
