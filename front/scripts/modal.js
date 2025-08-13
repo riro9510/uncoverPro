@@ -517,27 +517,14 @@ resetToFormState() {
 handleDownload() {
   console.log("Download ZIP URL:", this.zipUrl);
 
-  const downloadFile = (url, filename) => {
-    try {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      link.target = '_blank'; // necesario para abrir en nueva pestaña
-
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      console.error('Error en descarga:', error);
-      window.open(url, '_blank'); // fallback
-    }
-  };
-
-  // Descargar el ZIP en lugar de dos PDFs
-  downloadFile(
-    this.zipUrl,
-    `Documentos_${new Date().toISOString().slice(0, 10)}.zip`
-  );
+  const link = document.createElement('a');
+  link.href = this.zipUrl;
+  link.download = `Documentos_${new Date().toISOString().slice(0, 10)}.zip`;
+  link.target = '_blank';
+  
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
 
   //alert('Descargando archivos...');
   //this.close();

@@ -66,24 +66,36 @@ app.get('/download/:filename', (req, res) => {
   }
 });
 
-app.get('/generate-both', async (req, res) => {
+app.get('/generate-zip', async (req, res) => {
   try {
     const queryParams = req.query as unknown as FormRequest;
+    const filename = `documents_${Date.now()}.zip`;
+    const filePath = path.join(PUBLIC_DIR, filename);
+
+    // Generar ambos PDFs
     const cvBuffer = await generateCVBuffer(queryParams);
     const letterBuffer = await generateCoverLetterBuffer(queryParams);
 
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename=Documentos_${Date.now()}.zip`);
-
+    // Crear archivo ZIP temporal
+    const output = fs.createWriteStream(filePath);
     const archive = archiver('zip', { zlib: { level: 9 } });
-    archive.pipe(res);
 
+    output.on('close', () => {
+      res.download(filePath, () => {
+        setTimeout(() => fs.unlink(filePath, () => {}), 50000);
+      });
+    });
+
+    archive.on('error', (err) => {
+      throw err;
+    });
+
+    archive.pipe(output);
     archive.append(cvBuffer, { name: 'CV.pdf' });
     archive.append(letterBuffer, { name: 'CartaPresentacion.pdf' });
-
     await archive.finalize();
+
   } catch (err: any) {
-    console.error('❌ Error generando ZIP:', err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -116,7 +128,7 @@ wss.on('connection', (ws) => {
       ws.send(
         JSON.stringify({
           type: 'ready',
-          zipUrl: `${baseUrl}/generate-both?${new URLSearchParams(payload)}`,
+          zipUrl: `${baseUrl}/generate-zip?${new URLSearchParams(payload)}`
         })
       );
     } catch (err: any) {
