@@ -511,11 +511,22 @@ resetToFormState() {
 }
 
 handleDownload() {
-  // Implementa tu lógica de descarga aquí
-  console.log('Descargando datos:', this.formData);
-  alert('Iniciando descarga...');
+  const downloadFile = (url, filename) => {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  downloadFile(this.cvUrl, 'cv.pdf');
+  downloadFile(this.letterUrl, 'coverLetter.pdf');
+
+  alert('Descargando archivos...');
   this.close();
 }
+
 }
 
 const modalForm = new ModalForm();
