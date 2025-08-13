@@ -511,21 +511,28 @@ resetToFormState() {
 }
 
 handleDownload() {
-  console.log("url donde se intenta descargar",this.cvUrl,this.letterUrl);
+  console.log("Download URLs:", this.cvUrl, this.letterUrl);
+  
   const downloadFile = (url, filename) => {
+    // Usa window.open para forzar la descarga
+    window.open(url, '_blank');
+    
+    // Opcional: solución alternativa para navegadores que bloquean popups
     const link = document.createElement('a');
     link.href = url;
+    link.target = '_blank';
     link.download = filename;
     document.body.appendChild(link);
-    console.log("link",link);
     link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
   };
 
   downloadFile(this.cvUrl, 'cv.pdf');
   downloadFile(this.letterUrl, 'coverLetter.pdf');
-
-  //alert('Descargando archivos...');
+   //alert('Descargando archivos...');
   //this.close();
 }
 
