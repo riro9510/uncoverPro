@@ -48,8 +48,8 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
     doc.fontSize(TEXT_FONT_SIZE).text(data['professional_summary.summary']).moveDown(1);
 
     sectionTitle(doc, 'KEY SKILLS');
-    data['key_skills.skills'].forEach((skill) => {
-      doc.fontSize(TEXT_FONT_SIZE).text(`• ${skill}`);
+    data['key_skills.skills']?.split(',').forEach((skill: string) => {
+      doc.fontSize(TEXT_FONT_SIZE).text(`• ${skill.trim()}`);
     });
     doc.moveDown(1);
 
@@ -74,7 +74,7 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
       .moveDown(1);
 
     sectionTitle(doc, 'LANGUAGES');
-    data['languages.languages']?.forEach((lang) => {
+    data['languages.languages']?.split(',').forEach((lang: string) => {
       doc.fontSize(TEXT_FONT_SIZE).text(`• ${lang}`);
     });
 
