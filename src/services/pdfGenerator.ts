@@ -48,7 +48,10 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
 
     // Secciones
     sectionTitle(doc, titles.professionalSummary);
-    doc.fontSize(TEXT_FONT_SIZE).text(data['professional_summary.summary'], { align: alignDirection }).moveDown(1);
+    doc
+      .fontSize(TEXT_FONT_SIZE)
+      .text(data['professional_summary.summary'], { align: alignDirection })
+      .moveDown(1);
 
     sectionTitle(doc, titles.keySkills);
     data['key_skills.skills']?.split(',').forEach((skill: string) => {
@@ -64,9 +67,15 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
         continued: false,
         align: alignDirection,
       });
-    doc.fillColor(TEXT_COLOR).text(`${data['work_experience.period']}`, { align: alignDirection }).moveDown(0.5);
+    doc
+      .fillColor(TEXT_COLOR)
+      .text(`${data['work_experience.period']}`, { align: alignDirection })
+      .moveDown(0.5);
 
-    doc.fontSize(TEXT_FONT_SIZE).text(data['work_experience.achievements'], { align: alignDirection }).moveDown(1);
+    doc
+      .fontSize(TEXT_FONT_SIZE)
+      .text(data['work_experience.achievements'], { align: alignDirection })
+      .moveDown(1);
 
     sectionTitle(doc, titles.education);
     doc
@@ -74,7 +83,9 @@ export function generateCVBuffer(data: FormRequest): Promise<Buffer> {
       .fillColor(PRIMARY_COLOR)
       .text(`${data['education.degree']}`, { continued: true, align: alignDirection })
       .fillColor(TEXT_COLOR)
-      .text(` - ${data['education.institution']} (${data['education.graduation_year']})`, { align: alignDirection })
+      .text(` - ${data['education.institution']} (${data['education.graduation_year']})`, {
+        align: alignDirection,
+      })
       .moveDown(1);
 
     sectionTitle(doc, titles.languages);
@@ -103,7 +114,9 @@ export function generateCoverLetterBuffer(data: FormRequest): Promise<Buffer> {
     doc
       .fontSize(10)
       .text(`${data['personal_info.full_name']}`, { align: alignDirection })
-      .text(`${data['personal_info.email']} | ${data['personal_info.phone']}`, { align: alignDirection })
+      .text(`${data['personal_info.email']} | ${data['personal_info.phone']}`, {
+        align: alignDirection,
+      })
       .text(`${currentDate}`, { align: alignDirection })
       .moveDown(2);
 
@@ -114,10 +127,15 @@ export function generateCoverLetterBuffer(data: FormRequest): Promise<Buffer> {
 
     doc.text(texts.greeting, { align: alignDirection }).moveDown(1);
 
-    doc.text(
-      texts.intro(data["letter_customization.target_position"], data["letter_customization.target_company"]!),
-      { align: alignDirection }
-    ).moveDown(1);
+    doc
+      .text(
+        texts.intro(
+          data['letter_customization.target_position'],
+          data['letter_customization.target_company']!
+        ),
+        { align: alignDirection }
+      )
+      .moveDown(1);
 
     doc.text(texts.highlights, { align: alignDirection });
     doc.text(`${data['work_experience.achievements']}`, { align: alignDirection }).moveDown(1);

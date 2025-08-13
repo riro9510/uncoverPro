@@ -522,26 +522,14 @@ handleDownload() {
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
-      link.target = '_blank';
-
-      link.onclick = () => {
-        setTimeout(() => {
-          if (!document.body.contains(link)) {
-            window.open(url, '_blank');
-          }
-        }, 200);
-      };
+      link.target = '_blank'; // necesario para abrir en nueva pestaña
 
       document.body.appendChild(link);
       link.click();
-
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 500);
+      document.body.removeChild(link);
     } catch (error) {
       console.error('Error en descarga:', error);
-      window.open(url, '_blank');
+      window.open(url, '_blank'); // fallback
     }
   };
 
@@ -550,9 +538,11 @@ handleDownload() {
     this.zipUrl,
     `Documentos_${new Date().toISOString().slice(0, 10)}.zip`
   );
-    //alert('Descargando archivos...');
+
+  //alert('Descargando archivos...');
   //this.close();
 }
+
 
 }
 
