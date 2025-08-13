@@ -21,5 +21,5 @@ const getByLanguagename = async (req: Request, res: Response, next: NextFunction
 
 export default {
   getAll,
- getByLanguagename,
+  getByLanguagename,
 };

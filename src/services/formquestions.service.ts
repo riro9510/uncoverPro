@@ -12,15 +12,15 @@ const getByLanguageName = async (languageCode: string) => {
   }
 
   const forms = await Formquestions.find({
-    [languageCode]: { $exists: true }
+    [languageCode]: { $exists: true },
   }).lean();
 
-  return forms.map(form => ({
-    id: form._id, 
-    ...form[languageCode], 
+  return forms.map((form) => ({
+    id: form._id,
+    ...form[languageCode],
     metadata: {
-      availableLanguages: Object.keys(form).filter(key => validLanguages.includes(key))
-    }
+      availableLanguages: Object.keys(form).filter((key) => validLanguages.includes(key)),
+    },
   }));
 };
 
