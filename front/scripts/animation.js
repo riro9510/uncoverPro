@@ -65,6 +65,20 @@ function showCentralPhrases(index = 0) {
     showCentralPhrases(index + 1);
   }, 2500);
 }
+splashScreen.addEventListener("click", (e) => {
+  const skipButtonWidth = 60; 
+  const skipButtonHeight = 30;
+  const rect = splashScreen.getBoundingClientRect();
+  
+  if (
+    e.clientX > rect.right - skipButtonWidth - 20 &&
+    e.clientY > rect.top - skipButtonHeight - 20
+  ) {
+    splashScreen.style.display = "none";
+    mainContent.classList.remove("hidden");
+  }
+});
+
 
 
 window.addEventListener("DOMContentLoaded", () => {

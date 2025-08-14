@@ -1,5 +1,6 @@
 import { GetRequest } from "./api/typeRequest.js";
 import { WebSocketClient } from "./api/webSocket.js";
+import { showToast } from "./toast.js";
 
 let languageSelected;
 let jsonEnviado;
@@ -208,7 +209,7 @@ class ModalForm {
   }
   
  
-  toggleChip(container, value, field) {
+  async toggleChip(container, value, field) {
     const existingChip = container.querySelector(`.chip[data-value="${value}"]`);
     
     if (existingChip) {
@@ -216,7 +217,7 @@ class ModalForm {
     } else {
       const currentChips = container.querySelectorAll('.chip').length;
       if (field.maxSelections && currentChips >= field.maxSelections) {
-        alert(`Solo puedes seleccionar ${field.maxSelections} elementos`);
+        await showToast(`Solo puedes seleccionar ${field.maxSelections} elementos`);
         return;
       }
       
@@ -352,8 +353,8 @@ container.appendChild(checkboxWrapper);
     }
   }
   
-  nextSection() {
-    if (this.validateCurrentSection()) {
+  async nextSection() {
+    if (await this.validateCurrentSection()) {
       if (this.currentSectionIndex < this.sections.length - 1) {
         this.currentSectionIndex++;
         this.renderCurrentSection();
@@ -365,40 +366,38 @@ container.appendChild(checkboxWrapper);
     return this.currentSectionIndex === this.sections.length - 1;
   }
   
-validateCurrentSection() {
+async validateCurrentSection() {
   const currentSection = this.sections[this.currentSectionIndex];
   let isValid = true;
 
-  currentSection.fields.forEach(field => {
+  for (const field of currentSection.fields) {
     if (field.required && !this.formData[field.fieldId]) {
       isValid = false;
-      alert(`El campo "${field.question}" es requerido`);
+      await showToast(`El campo "${field.question}" es requerido`);
     }
     if (field.type === 'multiselect-chips') {
       const currentSelections = this.formData[field.fieldId]?.length || 0;
-      console.log("validacion chips", currentSection, this.formData[field.fieldId] );
       if (field.minSelections && currentSelections < field.minSelections) {
         isValid = false;
-        alert(`Debes seleccionar al menos ${field.minSelections} habilidades`);
+        await showToast(`Debes seleccionar al menos ${field.minSelections} habilidades`);
       }
-      
       if (field.maxSelections && currentSelections > field.maxSelections) {
         isValid = false;
-        alert(`Solo puedes seleccionar máximo ${field.maxSelections} habilidades`);
+        await showToast(`Solo puedes seleccionar máximo ${field.maxSelections} habilidades`);
       }
-      
     }
     if (field.type === 'daterange' && this.formData[field.fieldId]) {
-        const dateRegex = /^(0[1-9]|1[0-2])\/\d{4} - (0[1-9]|1[0-2])\/\d{4}$/;
-        if (!dateRegex.test(this.formData[field.fieldId])) {
-          isValid = false;
-          alert(`Formato de fecha inválido. Usa MM/YYYY - MM/YYYY`);
-        }
+      const dateRegex = /^(0[1-9]|1[0-2])\/\d{4} - (0[1-9]|1[0-2])\/\d{4}$/;
+      if (!dateRegex.test(this.formData[field.fieldId])) {
+        isValid = false;
+        await showToast(`Formato de fecha inválido. Usa MM/YYYY - MM/YYYY`);
       }
-  });
+    }
+  }
 
   return isValid;
 }
+
   
   open() {
     this.modal.classList.remove('hidden');
@@ -413,7 +412,7 @@ validateCurrentSection() {
   /*submitForm() {
     if (this.validateCurrentSection()) {
       console.log('Formulario completo enviado:', this.formData);
-      alert('Formulario enviado con éxito!');
+      await showToast('Formulario enviado con éxito!');
       this.close();
     }
   }*/
@@ -428,7 +427,7 @@ validateCurrentSection() {
     const client = new WebSocketClient('wss://uncoverpro.onrender.com');//const client = new WebSocketClient('ws://localhost:3000');
 
     // Primero asignamos el listener
-    client.handleMessage = (data) => {
+    client.handleMessage = async (data) => {
       switch (data.type) {
         case 'update':
           console.log('📡 Estado del proceso:', data.payload);
@@ -442,7 +441,7 @@ validateCurrentSection() {
         case 'error':
           console.error('❌ Error del servidor:', data.message);
           this.resetToFormState(); // ❌ Solo si hay error
-          alert('Error al procesar el formulario');
+          await showToast('Error al procesar el formulario');
           break;
         default:
           console.warn('Mensaje desconocido:', data);
@@ -458,16 +457,16 @@ validateCurrentSection() {
         jsonEnviado = finalJson;
         client.sendJSON(finalJson); 
       })
-      .catch(err => {
+      .catch(async err => {
         console.error('❌ Error conectando a WS', err);
         this.resetToFormState(); 
-        alert('Error al procesar el formulario');
+        await showToast('Error al procesar el formulario');
       });
 
   } catch (error) {
     console.error('❌ Error al procesar:', error);
     this.resetToFormState();
-    alert('Error al procesar el formulario');
+    await showToast('Error al procesar el formulario');
   }
 }
   showLoadingState() {
@@ -516,7 +515,7 @@ resetToFormState() {
   this.setupNavigation();
 }
 
-handleDownload() {
+  async handleDownload() {
  if (!this.zipUrl || this.zipUrl.includes('undefined')) {
     console.error('‼️ ERROR: URL mal formada', this.zipUrl);
     
@@ -539,7 +538,7 @@ handleDownload() {
   link.click();
   document.body.removeChild(link);
 
-  alert('Descargando archivos...');
+  await showToast('Descargando archivos...');
   this.close();
 }
 
@@ -563,9 +562,9 @@ document.querySelector('.ctaModalBtn').addEventListener('click',async () => {
       modalForm.init(dataObject);
       modalForm.open();
     })
-    .catch(error => {
+    .catch(async error => {
       console.error('Error al cargar el JSON:', error);
-      alert('Error al cargar el formulario');
+      await showToast('Error al cargar el formulario');
     });
 });
 
