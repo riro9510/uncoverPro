@@ -13,6 +13,22 @@
   z-index: 9999;
 }
 
+.splash-screen::after {
+  content: "Skip";
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(128, 128, 128, 0.2);
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 10000;
+  font-family: var(--font-body);
+}
+
+
 
 .scattered-words {
   position: absolute;
@@ -37,7 +53,6 @@
   100% { transform: translateY(-15px); }
 }
 
-/* Frases centrales */
 .central-phrases {
   position: relative;
   text-align: center;
@@ -67,3 +82,4 @@
 .hidden {
   display: none;
 }
+
